@@ -7,6 +7,7 @@ import { AdminRoute } from 'src/commons/decorators/admin-route.decorator';
 import { StakingService } from './staking.service';
 import { Staking } from './entities/staking.entity';
 import { StakingConfig } from './entities/staking-config.entity';
+import { StakingStat } from './entities/staking-stat.entity';
 import { StakingHistory } from './entities/staking-history.entity';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
@@ -51,13 +52,20 @@ export class StakingController {
     await this.stakingService.cancel(id, userId);
     return { message: 'Staking successfully unstaked' };
   }
-
+  /*
   @Get('staking/reward')
   @ApiOperation({ summary: '스테이킹 일일 보상량' })
   @ApiResponse({ status: 200, type: [StakingConfig] })
   async getDailyReward() {
     const config = await this.stakingService.getStakingConfig();
     return { dailyReward: config.rewardAmount }
+  }
+  */
+  @Get('staking/stats')
+  @ApiOperation({ summary: 'Stats 조회' })
+  @ApiResponse({ status: 200, description: 'Stats 반환', type: [StakingStat] })
+  async getStats(): Promise<any> {
+    return this.stakingService.getStats();
   }
 
   @Get('staking/historys')

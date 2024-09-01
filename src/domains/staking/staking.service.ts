@@ -7,6 +7,7 @@ import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
 import { StakingListDto } from './dto/staking-list.dto';
 import { AdminsService } from '../admins/admins.service';
 import { JoinStakingDto } from './dto/join-staking.dto';
+import { StakingStat } from './entities/staking-stat.entity';
 import { StakingHistory } from './entities/staking-history.entity';
 
 @Injectable()
@@ -16,6 +17,8 @@ export class StakingService {
     private stakingRepository: Repository<Staking>,
     @InjectRepository(StakingConfig)
     private stakingConfigRepository: Repository<StakingConfig>,
+    @InjectRepository(StakingStat)
+    private stakingStatRepository: Repository<StakingStat>,
     @InjectRepository(StakingHistory)
     private stakingHistoryRepository: Repository<StakingHistory>,
     private adminsService: AdminsService
@@ -125,6 +128,33 @@ export class StakingService {
   async createHistory(userId: number, actionId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
     const history = this.stakingHistoryRepository.create({ userId, actionId, action, txHash, amount });
     return this.stakingHistoryRepository.save(history);
+  }
+
+  async getTotalStaked() {
+    return 123;
+  }
+
+  async getAPY() {
+    return 12;
+  }
+
+  async getStats(): Promise<any> {
+    const stat = await this.stakingStatRepository.findOne({ where: { id: 1 } });
+    const stats = {
+      total: {
+        totalStaked: await this.getTotalStaked(),
+        dailyReward: (await (this.getStakingConfig())).rewardAmount,
+        apy: await this.getAPY()
+      },
+      nriStat: {
+        nriPrice: stat.nriPrice,
+        calculatedSupply: stat.totalSupply
+      },
+      ricoStat: {
+        ricoPrice: stat.ricoPrice
+      }
+    }
+    return stats;
   }
 
   async getHistorys(userId: number, paginationQuery): Promise<any> {

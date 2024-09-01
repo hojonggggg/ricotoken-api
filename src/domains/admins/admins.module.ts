@@ -11,10 +11,11 @@ import { MintingConfig } from '../minting/entities/minting-config.entity';
 import { StakingService } from '../staking/staking.service';
 import { Staking } from '../staking/entities/staking.entity';
 import { StakingConfig } from '../staking/entities/staking-config.entity';
+import { StakingStat } from '../staking/entities/staking-stat.entity';
 import { StakingHistory } from '../staking/entities/staking-history.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AllowedIp, AdminLog, Minting, MintingConfig, Staking, StakingConfig, StakingHistory])],
+  imports: [TypeOrmModule.forFeature([AllowedIp, AdminLog, Minting, MintingConfig, Staking, StakingConfig, StakingStat, StakingHistory])],
   controllers: [AdminsController],
   providers: [AdminIpGuard, AdminsService, MintingService, StakingService],
   exports: [AdminIpGuard, AdminsService],
