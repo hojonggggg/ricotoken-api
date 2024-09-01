@@ -46,9 +46,9 @@ export class AuthService {
   async login(user: any) {
     let payload;
     if (user.isAdmin) {
-      payload = { email: user.email, sub: user.id, isAdmin: user.isAdmin };
+      payload = { type: "admin", email: user.email, sub: user.id, isAdmin: user.isAdmin };
     } else {
-      payload = { walletAddress: user.walletAddress, sub: user.id, isAdmin: user.isAdmin };
+      payload = { type: "user", walletAddress: user.walletAddress, sub: user.id, isAdmin: user.isAdmin };
     }
     //const payload = { email: user.email, sub: user.id, isAdmin: user.isAdmin };
     return {
