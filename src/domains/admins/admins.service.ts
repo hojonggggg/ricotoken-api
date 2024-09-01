@@ -14,12 +14,19 @@ export class AdminsService {
   ) {}
 
   async addAllowedIp(userId: number, ip: string, adminIp: string): Promise<AllowedIp> {
+    console.log({ip});
     ip = "::ffff:" + ip;
-    const allowedIp = await this.allowedIpsRepository.save({ userId, ip });
-    const action = '아이피 추가';
-    const memo = ip;
-    await this.logAdminAction(userId, action, adminIp, memo);
-    return allowedIp;
+    console.log({ip});
+    try {
+      const allowedIp = await this.allowedIpsRepository.save({ userId, ip });
+      const action = '아이피 추가';
+      const memo = ip;
+      await this.logAdminAction(userId, action, adminIp, memo);
+      return allowedIp;
+    } catch (err) {
+      console.log({err});
+    }
+    
   }
 
   async isAllowedIp(ip: string): Promise<boolean> {
