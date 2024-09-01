@@ -23,32 +23,6 @@ import { PaginationResponseDto } from './dto/pagination-response.dto';
 export class StakingController {
   constructor(private readonly stakingService: StakingService) {}
 
-  @Post('staking')
-  @ApiOperation({ summary: '스테이킹 참여' })
-  @ApiResponse({ status: 200, type: [Staking] })
-  async join(@Body() joinStakingDto: JoinStakingDto, @Request() req) {
-    const { userId, walletAddress } = req.user;
-    joinStakingDto.userId = userId;
-    joinStakingDto.walletAddress = walletAddress;
-    return await this.stakingService.join(joinStakingDto);
-  }
-
-  @Get('stakings')
-  @ApiOperation({ summary: '스테이킹 전체 조회' })
-  @ApiResponse({ status: 200, type: [Staking] })
-  async findAllFromUser(@Query() paginationQuery: PaginationQueryDto, @Request() req) {
-    const { userId, walletAddress } = req.user;
-    return await this.stakingService.findAllFromUser(userId, walletAddress, paginationQuery);
-  }
-
-  @Get('staking/:id')
-  @ApiOperation({ summary: '스테이킹 조회' })
-  @ApiResponse({ status: 200, type: [Staking] })
-  async find(@Param('id') id: number, @Request() req) {
-    const { userId, walletAddress } = req.user;
-    return await this.stakingService.find(id, userId);
-  }
-
   @Get('staking/balance')
   @ApiOperation({ summary: '스테이킹 중인 NFT 개수' })
   @ApiResponse({ status: 200 })
@@ -71,6 +45,32 @@ export class StakingController {
   async getHistorys(@Query() paginationQuery: PaginationQueryDto, @Request() req): Promise<PaginationResponseDto> {
     const userId = req.user.userId;
     return await this.stakingService.getHistorys(userId, paginationQuery);
+  }
+
+  @Get('stakings')
+  @ApiOperation({ summary: '스테이킹 전체 조회' })
+  @ApiResponse({ status: 200, type: [Staking] })
+  async findAllFromUser(@Query() paginationQuery: PaginationQueryDto, @Request() req) {
+    const { userId, walletAddress } = req.user;
+    return await this.stakingService.findAllFromUser(userId, walletAddress, paginationQuery);
+  }
+
+  @Get('staking/:id')
+  @ApiOperation({ summary: '스테이킹 조회' })
+  @ApiResponse({ status: 200, type: [Staking] })
+  async find(@Param('id') id: number, @Request() req) {
+    const { userId, walletAddress } = req.user;
+    return await this.stakingService.find(id, userId);
+  }
+
+  @Post('staking')
+  @ApiOperation({ summary: '스테이킹 참여' })
+  @ApiResponse({ status: 200, type: [Staking] })
+  async join(@Body() joinStakingDto: JoinStakingDto, @Request() req) {
+    const { userId, walletAddress } = req.user;
+    joinStakingDto.userId = userId;
+    joinStakingDto.walletAddress = walletAddress;
+    return await this.stakingService.join(joinStakingDto);
   }
 
   @Patch('staking/claim')
