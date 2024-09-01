@@ -19,6 +19,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
   
   async validate(req: any, payload: any) {
+    console.log({payload});
+    console.log(req.ip);
     if (payload.isAdmin) {
       const isAllowedIp = await this.adminsService.isAllowedIp(req.ip);
       if (!isAllowedIp) {
