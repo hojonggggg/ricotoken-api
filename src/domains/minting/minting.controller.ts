@@ -63,4 +63,20 @@ export class MintingController {
     createMintingDto.walletAddress = walletAddress;
     return this.mintingService.minting(createMintingDto);
   }
+  /*
+  @Get('calculated-supply')
+  @ApiOperation({ summary: '발행된 NFT 총 수량' })
+  @ApiResponse({ status: 200 })
+  async getCalculatedSupply(): Promise<any> {
+    const calculatedSupply = await this.mintingService.getCalculatedSupply();
+    return { calculatedSupply: calculatedSupply };
+  }
+  */
+  @Get('remaining-supply')
+  @ApiOperation({ summary: '발행 가능한 NFT 총 수량' })
+  @ApiResponse({ status: 200 })
+  async getRemainingSupply(): Promise<any> {
+    const remainingSupply = await this.mintingService.getRemainingSupply();
+    return { remainingSupply: remainingSupply };
+  }
 }

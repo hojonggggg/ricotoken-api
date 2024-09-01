@@ -61,4 +61,14 @@ export class MintingService {
       },
     };
   }
+
+  async getCalculatedSupply() {
+    return 456;
+  }
+
+  async getRemainingSupply() {
+    const calculatedSupply = await this.getCalculatedSupply();
+    const remainingSupply = 50000 - calculatedSupply;
+    return remainingSupply;
+  }
 }

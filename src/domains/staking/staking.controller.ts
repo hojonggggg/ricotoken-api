@@ -61,6 +61,7 @@ export class StakingController {
     return { dailyReward: config.rewardAmount }
   }
   */
+
   @Get('staking/stats')
   @ApiOperation({ summary: 'Stats 조회' })
   @ApiResponse({ status: 200, description: 'Stats 반환', type: [StakingStat] })

@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import { Staking } from './entities/staking.entity';
 import { StakingConfig } from './entities/staking-config.entity';
 import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
-import { StakingListDto } from './dto/staking-list.dto';
 import { AdminsService } from '../admins/admins.service';
+import { MintingService } from '../minting/minting.service';
 import { JoinStakingDto } from './dto/join-staking.dto';
 import { StakingStat } from './entities/staking-stat.entity';
 import { StakingHistory } from './entities/staking-history.entity';
@@ -21,7 +21,8 @@ export class StakingService {
     private stakingStatRepository: Repository<StakingStat>,
     @InjectRepository(StakingHistory)
     private stakingHistoryRepository: Repository<StakingHistory>,
-    private adminsService: AdminsService
+    private adminsService: AdminsService,
+    private mintingService: MintingService,
   ) {}
 
   async getStakingConfig(): Promise<StakingConfig> {
@@ -130,7 +131,7 @@ export class StakingService {
     return this.stakingHistoryRepository.save(history);
   }
 
-  async getTotalStaked() {
+  async getTotalStakingCount() {
     return 123;
   }
 
@@ -142,13 +143,13 @@ export class StakingService {
     const stat = await this.stakingStatRepository.findOne({ where: { id: 1 } });
     const stats = {
       total: {
-        totalStaked: await this.getTotalStaked(),
+        totalStaked: await this.getTotalStakingCount(),
         dailyReward: (await (this.getStakingConfig())).rewardAmount,
         apy: await this.getAPY()
       },
       nriStat: {
         nriPrice: stat.nriPrice,
-        calculatedSupply: stat.totalSupply
+        calculatedSupply: await this.mintingService.getCalculatedSupply(),
       },
       ricoStat: {
         ricoPrice: stat.ricoPrice
