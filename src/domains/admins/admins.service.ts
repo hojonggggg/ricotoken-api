@@ -14,6 +14,7 @@ export class AdminsService {
   ) {}
 
   async addAllowedIp(userId: number, ip: string, adminIp: string): Promise<AllowedIp> {
+    ip = "::ffff:" + ip;
     const allowedIp = await this.allowedIpsRepository.save({ userId, ip });
     const action = '아이피 추가';
     const memo = ip;
