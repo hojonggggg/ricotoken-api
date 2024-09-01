@@ -7,6 +7,8 @@ import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
 import { AdminsService } from '../admins/admins.service';
 import { MintingService } from '../minting/minting.service';
 import { JoinStakingDto } from './dto/join-staking.dto';
+import { CancelStakingDto } from './dto/cancel-staking.dto';
+import { ClaimStakingDto } from './dto/claim-staking.dto';
 import { StakingStat } from './entities/staking-stat.entity';
 import { StakingHistory } from './entities/staking-history.entity';
 
@@ -94,6 +96,10 @@ export class StakingService {
   }
   */
 
+  async find(id, userId) {
+    return await this.stakingRepository.findOne({ where: { id, userId }, });
+  }
+
   async findAllFromUser(userId, walletAddress, paginationQuery) {
     const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;
@@ -102,7 +108,7 @@ export class StakingService {
       where: { userId: userId, walletAddress: walletAddress },
       skip,
       take: limit,
-      order: { id: 'ASC' }, // 정렬 옵션
+      order: { id: 'DESC' }, // 정렬 옵션
     });
 
     return {
@@ -116,14 +122,15 @@ export class StakingService {
     };
   }
 
-  async cancel(id: number, userId: number): Promise<void> {
+  async cancel(userId: number, cancelStakingDto: CancelStakingDto): Promise<void> {
+    const { id, txHash } = cancelStakingDto;
     const staking = await this.stakingRepository.findOne({ where: { id, userId } });
     if (!staking) {
       throw new NotFoundException(`Staking with ID "${id}" not found`);
     }
     staking.status = 'Unstaked';
     await this.stakingRepository.save(staking);
-    await this.createHistory(userId, id, "Unstaked", null, null);
+    await this.createHistory(userId, id, "Unstaked", txHash, null);
   }
 
   async createHistory(userId: number, actionId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
@@ -178,5 +185,21 @@ export class StakingService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async getBalance(userId: number) {
+    return this.stakingRepository.count({ where: { userId, status: 'Staked'}});
+  }
+
+  async claim(userId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
+    const { id, txHash } = claimStakingDto;
+    const staking = await this.stakingRepository.findOne({ where: { id }});
+    const { receivedReward, availableReward } = staking;
+    const newReceivedReward = (+receivedReward) + (+availableReward);
+    const newAvalableReward = 0;
+    staking.receivedReward = newReceivedReward;
+    staking.availableReward = newAvalableReward;
+    await this.stakingRepository.save(staking);
+    await this.createHistory(userId, staking.id, 'Claim', txHash, availableReward.toString());
   }
 }

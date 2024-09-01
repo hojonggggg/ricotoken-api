@@ -12,44 +12,21 @@ import { CreateMintingDto } from './dto/create-minting.dto';
 @Controller('minting')
 export class MintingController {
   constructor(private readonly mintingService: MintingService) {}
-  /*
-  @Get('config')
-  @UseGuards(JwtAuthGuard, IsAdminGuard, AdminIpGuard)
-  @ApiBearerAuth()
-  @AdminRoute()
-  @ApiOperation({ summary: '[ADMIN] 민팅 설정 정보 조회' })
-  @ApiResponse({ status: 200, description: 'Returns the current minting configuration', type: MintingConfig })
-  async getMintingConfig(): Promise<MintingConfig> {
-    return this.mintingService.getMintingConfig();
-  }
 
-  @Put('config')
-  @UseGuards(JwtAuthGuard, IsAdminGuard, AdminIpGuard)
-  @ApiBearerAuth()
-  @AdminRoute()
-  @ApiOperation({ summary: '[ADMIN] 민팅 설정 정보 수정' })
-  @ApiResponse({ status: 200, description: 'The minting configuration has been successfully updated', type: MintingConfig })
-  async updateMintingConfig(@Body() updateDto: UpdateMintingConfigDto): Promise<MintingConfig> {
-    return this.mintingService.updateMintingConfig(updateDto);
-  }
-
-  @Get()
-  @UseGuards(JwtAuthGuard, IsAdminGuard, AdminIpGuard)
-  @ApiBearerAuth()
-  @AdminRoute()
-  @ApiOperation({ summary: '[ADMIN] 민팅 목록 조회' })
-  @ApiResponse({ status: 200, description: 'Return all stakings.', type: [Minting] })
-  async findAll(@Query() paginationQuery: PaginationQueryDto) {
-    return this.mintingService.findAll();
-  }
-  */
-
-  @Get('minting-active')
+  @Get('is-active')
   @ApiOperation({ summary: 'NFT 판매 상태' })
   @ApiResponse({ status: 200, type: MintingConfig }) 
-  async getMintingActive() {
+  async getIsActive() {
     const config = await this.mintingService.getMintingConfig();
     return { isActive: config.isMintingActive }
+  }
+  
+  @Get('remaining-supply')
+  @ApiOperation({ summary: '발행 가능한 NFT 총 수량' })
+  @ApiResponse({ status: 200 })
+  async getRemainingSupply(): Promise<any> {
+    const remainingSupply = await this.mintingService.getRemainingSupply();
+    return { remainingSupply: remainingSupply };
   }
 
   @Post()
@@ -72,11 +49,4 @@ export class MintingController {
     return { calculatedSupply: calculatedSupply };
   }
   */
-  @Get('remaining-supply')
-  @ApiOperation({ summary: '발행 가능한 NFT 총 수량' })
-  @ApiResponse({ status: 200 })
-  async getRemainingSupply(): Promise<any> {
-    const remainingSupply = await this.mintingService.getRemainingSupply();
-    return { remainingSupply: remainingSupply };
-  }
 }

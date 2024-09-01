@@ -49,6 +49,13 @@ export class AdminsController {
     return this.adminsService.addAllowedIp(userId, createAllowedIpDto.ip, ip);
   }
 
+  @Get('allowed-ips/:ip')
+  @ApiOperation({ summary: '특정 IP의 허용 여부 확인' })
+  @ApiResponse({ status: 200, description: 'IP의 허용 여부 반환', type: Boolean })
+  async isAllowedIp(@Param('ip') ip: string): Promise<boolean> {
+    return this.adminsService.isAllowedIp(ip);
+  }
+
   @Delete('allowed-ips/:id')
   @ApiOperation({ summary: '허용 IP 삭제' })
   @ApiResponse({ status: 200, description: '허용 IP가 성공적으로 삭제됨' })
@@ -60,20 +67,6 @@ export class AdminsController {
     const userId = req.user.userId;
     await this.adminsService.removeAllowedIp(userId, id, ip);
     return { message: 'Allowed IP successfully deleted' };
-  }
-
-  @Get('allowed-ips/:ip')
-  @ApiOperation({ summary: '특정 IP의 허용 여부 확인' })
-  @ApiResponse({ status: 200, description: 'IP의 허용 여부 반환', type: Boolean })
-  async isAllowedIp(@Param('ip') ip: string): Promise<boolean> {
-    return this.adminsService.isAllowedIp(ip);
-  }
-
-  @Get('logs')
-  @ApiOperation({ summary: '관리자 로그 조회' })
-  @ApiResponse({ status: 200, description: '관리자 로그 반환', type: [AdminLog] })
-  async getAdminLogs(@Query() paginationQuery: PaginationQueryDto): Promise<PaginationResponseDto> {
-    return this.adminsService.getAdminLogs(paginationQuery);
   }
 
   @Get('minting-config')
@@ -121,5 +114,12 @@ export class AdminsController {
   @ApiResponse({ status: 200, type: [Staking] })
   async findAllFromAdmin(@Query() paginationQuery: PaginationQueryDto) {
     return this.stakingService.findAllFromAdmin(paginationQuery);
+  }
+
+  @Get('logs')
+  @ApiOperation({ summary: '관리자 로그 조회' })
+  @ApiResponse({ status: 200, description: '관리자 로그 반환', type: [AdminLog] })
+  async getAdminLogs(@Query() paginationQuery: PaginationQueryDto): Promise<PaginationResponseDto> {
+    return this.adminsService.getAdminLogs(paginationQuery);
   }
 }

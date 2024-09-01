@@ -12,6 +12,8 @@ import { StakingHistory } from './entities/staking-history.entity';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
 import { JoinStakingDto } from './dto/join-staking.dto';
+import { CancelStakingDto } from './dto/cancel-staking.dto';
+import { ClaimStakingDto } from './dto/claim-staking.dto';
 import { PaginationResponseDto } from './dto/pagination-response.dto';
 
 @ApiTags('staking')
@@ -28,45 +30,39 @@ export class StakingController {
     const { userId, walletAddress } = req.user;
     joinStakingDto.userId = userId;
     joinStakingDto.walletAddress = walletAddress;
-    return this.stakingService.join(joinStakingDto);
+    return await this.stakingService.join(joinStakingDto);
   }
 
-  @Get('stakings/:walletAddress')
-  @ApiOperation({ summary: '스테이킹 참여 내역 조회' })
+  @Get('stakings')
+  @ApiOperation({ summary: '스테이킹 전체 조회' })
   @ApiResponse({ status: 200, type: [Staking] })
-  async findAllFromUser(@Param('walletAddress') walletAddress: string, @Query() paginationQuery: PaginationQueryDto, @Request() req) {
-    console.log(walletAddress);
-    console.log(req.user.walletAddress);
-    if (walletAddress != req.user.walletAddress) {
-      throw new UnauthorizedException('Access denied from this wallet address');
-    }
-    const userId = req.user.userId;
-    return this.stakingService.findAllFromUser(userId, walletAddress, paginationQuery);
+  async findAllFromUser(@Query() paginationQuery: PaginationQueryDto, @Request() req) {
+    const { userId, walletAddress } = req.user;
+    return await this.stakingService.findAllFromUser(userId, walletAddress, paginationQuery);
   }
 
-  @Patch('staking/unstaked/:id')
-  @ApiOperation({ summary: '스테이킹 해지' })
+  @Get('staking/:id')
+  @ApiOperation({ summary: '스테이킹 조회' })
+  @ApiResponse({ status: 200, type: [Staking] })
+  async find(@Param('id') id: number, @Request() req) {
+    const { userId, walletAddress } = req.user;
+    return await this.stakingService.find(id, userId);
+  }
+
+  @Get('staking/balance')
+  @ApiOperation({ summary: '스테이킹 중인 NFT 개수' })
   @ApiResponse({ status: 200 })
-  async cancel(@Param('id') id: number, @Request() req) {
-    const userId = req.user.userId;
-    await this.stakingService.cancel(id, userId);
-    return { message: 'Staking successfully unstaked' };
+  async getBalance(@Request() req): Promise<{ stakingBalance: number }> {
+    const { userId } = req.user;
+    const balance = await this.stakingService.getBalance(userId);
+    return { stakingBalance: balance };
   }
-  /*
-  @Get('staking/reward')
-  @ApiOperation({ summary: '스테이킹 일일 보상량' })
-  @ApiResponse({ status: 200, type: [StakingConfig] })
-  async getDailyReward() {
-    const config = await this.stakingService.getStakingConfig();
-    return { dailyReward: config.rewardAmount }
-  }
-  */
 
   @Get('staking/stats')
   @ApiOperation({ summary: 'Stats 조회' })
   @ApiResponse({ status: 200, description: 'Stats 반환', type: [StakingStat] })
   async getStats(): Promise<any> {
-    return this.stakingService.getStats();
+    return await this.stakingService.getStats();
   }
 
   @Get('staking/historys')
@@ -74,6 +70,24 @@ export class StakingController {
   @ApiResponse({ status: 200, description: '히스토리 반환', type: [StakingHistory] })
   async getHistorys(@Query() paginationQuery: PaginationQueryDto, @Request() req): Promise<PaginationResponseDto> {
     const userId = req.user.userId;
-    return this.stakingService.getHistorys(userId, paginationQuery);
+    return await this.stakingService.getHistorys(userId, paginationQuery);
+  }
+
+  @Patch('staking/claim')
+  @ApiOperation({ summary: '보상 수령' })
+  @ApiResponse({ status: 200 })
+  async claim(@Body() claimStakingDto: ClaimStakingDto, @Request() req) {
+    const userId = req.user.userId;
+    await this.stakingService.claim(userId, claimStakingDto);
+    return { message: 'Successfully received reward' };
+  }
+
+  @Patch('staking/unstaked')
+  @ApiOperation({ summary: '스테이킹 해지' })
+  @ApiResponse({ status: 200 })
+  async cancel(@Body() canelStakingDto: CancelStakingDto, @Request() req) {
+    const userId = req.user.userId;
+    await this.stakingService.cancel(userId, canelStakingDto);
+    return { message: 'Staking successfully unstaked' };
   }
 }
