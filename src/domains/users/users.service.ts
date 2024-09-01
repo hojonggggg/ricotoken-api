@@ -25,6 +25,13 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async createUser(walletAddress: string): Promise<User> {
+    const user = this.usersRepository.create({
+      walletAddress
+    });
+    return this.usersRepository.save(user);
+  }
+
   async findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }

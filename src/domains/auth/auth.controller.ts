@@ -11,8 +11,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  @ApiOperation({ summary: '사용자 로그인' })
-  @ApiResponse({ status: 200, description: 'JWT 토큰 반환' })
+  @ApiOperation({ summary: '로그인', description: '관리자 <br/> - type: admin <br/> - email, password 입력 <br/><br/> 사용자 <br/> - type: user <br/> - walletAddress 입력' })
+  @ApiResponse({ status: 200 })
   @ApiBody({ type: LoginDto })
   async login(@Request() req, @Body() loginDto: LoginDto) {
     console.log({loginDto});

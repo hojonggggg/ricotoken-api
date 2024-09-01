@@ -50,7 +50,9 @@ export class StakingService {
     return this.stakingRepository.save(staking);
   }
 
-  async findAllFromAdmin(page: number = 1, limit: number = 10) {
+  //async findAllFromAdmin(page: number = 1, limit: number = 10) {
+    async findAllFromAdmin(paginationQuery) {
+    const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;
 
     const [stakings, total] = await this.stakingRepository.findAndCount({
@@ -83,12 +85,12 @@ export class StakingService {
   }
   */
 
-  async findAllFromUser(userId, paginationQuery) {
+  async findAllFromUser(userId, walletAddress, paginationQuery) {
     const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;
 
     const [stakings, total] = await this.stakingRepository.findAndCount({
-      where: { userId: userId },
+      where: { userId: userId, walletAddress: walletAddress },
       skip,
       take: limit,
       order: { id: 'DESC' }, // 정렬 옵션
@@ -110,7 +112,7 @@ export class StakingService {
     if (!staking) {
       throw new NotFoundException(`Staking with ID "${id}" not found`);
     }
-    staking.status = 'Canceled';
+    staking.status = 'Unstaked';
     await this.stakingRepository.save(staking);
   }
 }

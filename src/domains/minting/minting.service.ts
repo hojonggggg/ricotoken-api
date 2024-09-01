@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Minting } from './entities/minting.entity';
 import { MintingConfig } from './entities/minting-config.entity';
 import { UpdateMintingConfigDto } from './dto/update-minting-config.dto';
+import { CreateMintingDto } from './dto/create-minting.dto';
 
 @Injectable()
 export class MintingService {
@@ -22,17 +23,26 @@ export class MintingService {
     return config;
   }
 
-  async updateMintingConfig(updateDto: UpdateMintingConfigDto): Promise<MintingConfig> {
+  async updateMintingConfig(updateMintingConfigDto: UpdateMintingConfigDto): Promise<MintingConfig> {
     let config = await this.mintingConfigRepository.findOne({ where: { id: 1 } });
     if (!config) {
-      config = this.mintingConfigRepository.create({ id: 1, ...updateDto });
+      config = this.mintingConfigRepository.create({ id: 1, ...updateMintingConfigDto });
     } else {
-      Object.assign(config, updateDto);
+      Object.assign(config, updateMintingConfigDto);
     }
     return this.mintingConfigRepository.save(config);
   }
 
-  async findAll(page: number = 1, limit: number = 10) {
+  async minting(createMintingDto: CreateMintingDto): Promise<Minting> {
+    const minting = this.mintingRepository.create({
+      ...createMintingDto
+    });
+    return this.mintingRepository.save(minting);
+  }
+
+  //async findAll(page: number = 1, limit: number = 10) {
+  async findAll(paginationQuery) {
+    const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;
 
     const [mintings, total] = await this.mintingRepository.findAndCount({

@@ -3,10 +3,12 @@ import { IsEmail, IsString, MinLength, IsOptional, IsBoolean } from 'class-valid
 
 export class CreateUserDto {
   @ApiProperty({ example: 'user@example.com', description: 'The email of the user' })
+  @IsOptional()
   @IsEmail()
   email: string;
 
   @ApiProperty({ example: 'password123', description: 'The password of the user' })
+  @IsOptional()
   @IsString()
   @MinLength(6)
   password: string;

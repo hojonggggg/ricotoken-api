@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AdminsService } from 'src/domains/admins/admins.service';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class IsAdminGuard implements CanActivate {
     const user = request.user;
     
     if (!user || !user.isAdmin) {
-      return false;
+      throw new UnauthorizedException('Access denied from IsAdminGuard');
     }
 
     const clientIp = request.ip;

@@ -4,21 +4,22 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { AllowedIp } from '../admins/entities/allowed-ip.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminRoute } from '../../commons/decorators/admin-route.decorator';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
   @AdminRoute()
   @ApiBearerAuth()
   @ApiOperation({ summary: '사용자 생성' })
-  @ApiResponse({ status: 201, description: 'The user has been successfully created.', type: User })
+  @ApiResponse({ status: 201, type: User })
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -28,7 +29,7 @@ export class UsersController {
   @AdminRoute()
   @ApiBearerAuth()
   @ApiOperation({ summary: '전체 사용자 조회' })
-  @ApiResponse({ status: 200, description: 'Return all users.', type: [User] })
+  @ApiResponse({ status: 200, type: [User] })
   async findAll() {
     return this.usersService.findAll();
   }
@@ -37,7 +38,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '특정 사용자 조회' })
-  @ApiResponse({ status: 200, description: 'Return the user.', type: User })
+  @ApiResponse({ status: 200, type: User })
   async findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
@@ -46,7 +47,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '사용자 패스워드 변경' })
-  @ApiResponse({ status: 200, description: 'The user has been successfully updated.', type: User })
+  @ApiResponse({ status: 200, type: User })
   async update(@Body() updateUserDto: UpdateUserDto, @Request() req) {
     const userId = req.user.userId;
     return this.usersService.update(+userId, updateUserDto);

@@ -24,7 +24,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       if (!isAllowedIp) {
         throw new UnauthorizedException('Access denied from this IP address');
       }
+      return { userId: payload.sub, email: payload.email, isAdmin: payload.isAdmin };
     }
-    return { userId: payload.sub, email: payload.email, isAdmin: payload.isAdmin };
+    return { userId: payload.sub, walletAddress: payload.walletAddress, isAdmin: payload.isAdmin };
+    
   }
 }

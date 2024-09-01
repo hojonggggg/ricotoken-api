@@ -9,7 +9,8 @@ export class AdminIpGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     
-    if (!user || !user.isAdmin) {
+    //if (!user || !user.isAdmin) {
+      if (!user) {
       return false;
     }
 

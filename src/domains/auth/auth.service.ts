@@ -25,7 +25,12 @@ export class AuthService {
       const { password, ...result } = user;
       return result;
     }
-    return null;
+
+    else if (!user) {
+      const newUser = await this.usersService.createUser(walletAddress);
+      const { ...result } = newUser;
+      return result;
+    }
   }
   /*
   async validateUser(email: string, password: string): Promise<any> {
@@ -39,7 +44,13 @@ export class AuthService {
   */
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id, isAdmin: user.isAdmin };
+    let payload;
+    if (user.isAdmin) {
+      payload = { email: user.email, sub: user.id, isAdmin: user.isAdmin };
+    } else {
+      payload = { walletAddress: user.walletAddress, sub: user.id, isAdmin: user.isAdmin };
+    }
+    //const payload = { email: user.email, sub: user.id, isAdmin: user.isAdmin };
     return {
       accessToken: this.jwtService.sign(payload),
       isAdmin: user.isAdmin
