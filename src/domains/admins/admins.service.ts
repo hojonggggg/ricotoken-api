@@ -14,19 +14,12 @@ export class AdminsService {
   ) {}
 
   async addAllowedIp(userId: number, ip: string, adminIp: string): Promise<AllowedIp> {
-    console.log({ip});
     ip = "::ffff:" + ip;
-    console.log({ip});
-    try {
-      const allowedIp = await this.allowedIpsRepository.save({ userId, ip });
-      const action = '아이피 추가';
-      const memo = ip;
-      await this.logAdminAction(userId, action, adminIp, memo);
-      return allowedIp;
-    } catch (err) {
-      console.log({err});
-    }
-    
+    const allowedIp = await this.allowedIpsRepository.save({ userId, ip });
+    const action = '아이피 추가';
+    const memo = ip;
+    await this.logAdminAction(userId, action, adminIp, memo);
+    return allowedIp;
   }
 
   async isAllowedIp(ip: string): Promise<boolean> {
@@ -50,13 +43,24 @@ export class AdminsService {
     return this.adminLogRepository.save(log);
   }
 
-  async getAdminLogs(page: number = 1, limit: number = 10): Promise<{ logs: AdminLog[], total: number }> {
+  async getAdminLogs(paginationQuery): Promise<any> {
+    const { page, limit } = paginationQuery;
+    const skip = (page - 1) * limit;
+
     const [logs, total] = await this.adminLogRepository.findAndCount({
       order: { createdAt: 'DESC' },
       take: limit,
       skip: (page - 1) * limit,
     });
 
-    return { logs, total };
+    return {
+      data: logs,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

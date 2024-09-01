@@ -72,13 +72,8 @@ export class AdminsController {
   @Get('logs')
   @ApiOperation({ summary: '관리자 로그 조회' })
   @ApiResponse({ status: 200, description: '관리자 로그 반환', type: [AdminLog] })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getAdminLogs(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
-  ): Promise<PaginationResponseDto> {
-    return this.adminsService.getAdminLogs(page, limit);
+  async getAdminLogs(@Query() paginationQuery: PaginationQueryDto): Promise<PaginationResponseDto> {
+    return this.adminsService.getAdminLogs(paginationQuery);
   }
 
   @Get('minting-config')

@@ -7,6 +7,7 @@ import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
 import { StakingListDto } from './dto/staking-list.dto';
 import { AdminsService } from '../admins/admins.service';
 import { JoinStakingDto } from './dto/join-staking.dto';
+import { StakingHistory } from './entities/staking-history.entity';
 
 @Injectable()
 export class StakingService {
@@ -15,6 +16,8 @@ export class StakingService {
     private stakingRepository: Repository<Staking>,
     @InjectRepository(StakingConfig)
     private stakingConfigRepository: Repository<StakingConfig>,
+    @InjectRepository(StakingHistory)
+    private stakingHistoryRepository: Repository<StakingHistory>,
     private adminsService: AdminsService
   ) {}
 
@@ -51,7 +54,7 @@ export class StakingService {
   }
 
   //async findAllFromAdmin(page: number = 1, limit: number = 10) {
-    async findAllFromAdmin(paginationQuery) {
+  async findAllFromAdmin(paginationQuery) {
     const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;
 
@@ -93,7 +96,7 @@ export class StakingService {
       where: { userId: userId, walletAddress: walletAddress },
       skip,
       take: limit,
-      order: { id: 'DESC' }, // 정렬 옵션
+      order: { id: 'ASC' }, // 정렬 옵션
     });
 
     return {
@@ -114,5 +117,11 @@ export class StakingService {
     }
     staking.status = 'Unstaked';
     await this.stakingRepository.save(staking);
+    await this.createHistory(userId, id, "Unstaked", null, null);
+  }
+
+  async createHistory(userId: number, actionId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
+    const history = this.stakingHistoryRepository.create({ userId, actionId, action, txHash, amount });
+    return this.stakingHistoryRepository.save(history);
   }
 }
