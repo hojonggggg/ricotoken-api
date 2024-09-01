@@ -15,12 +15,13 @@ export class IsAdminGuard implements CanActivate {
     }
 
     const clientIp = request.ip;
-    //return this.adminsService.isAllowedIp(clientIp);
+    /*
     const isAllowed = await this.adminsService.isAllowedIp(clientIp);
     
     if (!isAllowed) {
-      //throw new UnauthorizedException('Access denied from this IP address');
+      throw new UnauthorizedException('Access denied from this IP address');
     }
+    */
 
     return true;
   }
