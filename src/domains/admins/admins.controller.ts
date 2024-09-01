@@ -37,7 +37,7 @@ export class AdminsController {
     console.log('User from request:', req.user);
     try {
       const result = await this.adminsService.getAllAllowedIps();
-      console.log('getAllAllowedIps result:', result);
+      //console.log('getAllAllowedIps result:', result);
       return result;
     } catch (error) {
       console.error('Error in getAllAllowedIps:', error);
