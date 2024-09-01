@@ -14,7 +14,7 @@ export class IsAdminGuard implements CanActivate {
       throw new UnauthorizedException('Access denied from IsAdminGuard');
     }
 
-    const clientIp = request.ip;
+    //const clientIp = request.ip;
     /*
     const isAllowed = await this.adminsService.isAllowedIp(clientIp);
     
