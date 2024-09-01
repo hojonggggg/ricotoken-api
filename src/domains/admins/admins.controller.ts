@@ -33,16 +33,8 @@ export class AdminsController {
   @ApiOperation({ summary: '모든 허용된 IP 조회' })
   @ApiResponse({ status: 200, description: '모든 허용된 IP 반환', type: [AllowedIp] })
   async getAllAllowedIps(@Request() req): Promise<AllowedIp[]> {
-    console.log('getAllAllowedIps called');
-    console.log('User from request:', req.user);
-    try {
-      const result = await this.adminsService.getAllAllowedIps();
-      //console.log('getAllAllowedIps result:', result);
-      return result;
-    } catch (error) {
-      console.error('Error in getAllAllowedIps:', error);
-      throw error;
-    }
+    const result = await this.adminsService.getAllAllowedIps();
+    return result;
   }
 
   @Post('allowed-ips')
