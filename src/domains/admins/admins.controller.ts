@@ -20,7 +20,7 @@ import { PaginationQueryDto } from './dto/pagination-query.dto';
 
 @ApiTags('admins')
 @Controller('admin')
-@UseGuards(JwtAuthGuard, IsAdminGuard, AdminIpGuard)
+@UseGuards(JwtAuthGuard, IsAdminGuard)
 @ApiBearerAuth()
 export class AdminsController {
   constructor(

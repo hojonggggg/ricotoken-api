@@ -6,12 +6,12 @@ export class AdminIpGuard implements CanActivate {
   constructor(private adminsService: AdminsService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log("::admin > admin-ip.guard > canActivate");
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     
-    //if (!user || !user.isAdmin) {
-      if (!user) {
-      return false;
+    if (!user || !user.isAdmin) {
+      throw new UnauthorizedException('Access denied from AdminIpGuard');
     }
 
     const clientIp = request.ip;

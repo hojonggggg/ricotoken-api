@@ -6,6 +6,7 @@ export class IsAdminGuard implements CanActivate {
   constructor(private adminsService: AdminsService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log("::auth > is-admin.guard > canActivate");
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     
@@ -14,6 +15,13 @@ export class IsAdminGuard implements CanActivate {
     }
 
     const clientIp = request.ip;
-    return this.adminsService.isAllowedIp(clientIp);
+    //return this.adminsService.isAllowedIp(clientIp);
+    const isAllowed = await this.adminsService.isAllowedIp(clientIp);
+    
+    if (!isAllowed) {
+      //throw new UnauthorizedException('Access denied from this IP address');
+    }
+
+    return true;
   }
 }
