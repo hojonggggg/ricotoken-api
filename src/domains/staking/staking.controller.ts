@@ -7,9 +7,11 @@ import { AdminRoute } from 'src/commons/decorators/admin-route.decorator';
 import { StakingService } from './staking.service';
 import { Staking } from './entities/staking.entity';
 import { StakingConfig } from './entities/staking-config.entity';
+import { StakingHistory } from './entities/staking-history.entity';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
 import { JoinStakingDto } from './dto/join-staking.dto';
+import { PaginationResponseDto } from './dto/pagination-response.dto';
 
 @ApiTags('staking')
 @Controller()
@@ -17,45 +19,15 @@ import { JoinStakingDto } from './dto/join-staking.dto';
 @ApiBearerAuth()
 export class StakingController {
   constructor(private readonly stakingService: StakingService) {}
-  /*
-  @Get('staking/config')
-  @UseGuards(IsAdminGuard, AdminIpGuard)
-  @AdminRoute()
-  @ApiOperation({ summary: '[ADMIN] 스테이킹 설정 정보 조회' })
-  @ApiResponse({ status: 200, type: StakingConfig })
-  async getStakingConfig(): Promise<StakingConfig> {
-    return this.stakingService.getStakingConfig();
-  }
 
-  @Put('staking/config')
-  @UseGuards(IsAdminGuard, AdminIpGuard)
-  @AdminRoute()
-  @ApiOperation({ summary: '[ADMIN] 스테이킹 설정 정보 수정' })
-  @ApiResponse({ status: 200, type: StakingConfig })
-  async updateStakingConfig(
-    @Body() updateDto: UpdateStakingConfigDto, 
-    @Ip() ip: string,
-    @Request() req
-  ): Promise<StakingConfig> {
-    const userId = req.user.userId;
-    return this.stakingService.updateStakingConfig(userId, updateDto, ip);
-  }
-
-  @Get('stakings')
-  @UseGuards(IsAdminGuard, AdminIpGuard)
-  @AdminRoute()
-  @ApiOperation({ summary: '[ADMIN] 스테이킹 목록 조회' })
-  @ApiResponse({ status: 200, type: [Staking] })
-  async findAllFromAdmin(@Query() paginationQuery: PaginationQueryDto) {
-    return this.stakingService.findAllFromAdmin();
-  }
-  */
   @Post('staking')
   @ApiOperation({ summary: '스테이킹 참여' })
   @ApiResponse({ status: 200, type: [Staking] })
   async join(@Body() joinStakingDto: JoinStakingDto, @Request() req) {
-    const userId = req.user.userId;
-    return this.stakingService.join(userId, joinStakingDto);
+    const { userId, walletAddress } = req.user;
+    joinStakingDto.userId = userId;
+    joinStakingDto.walletAddress = walletAddress;
+    return this.stakingService.join(joinStakingDto);
   }
 
   @Get('stakings/:walletAddress')
@@ -65,7 +37,7 @@ export class StakingController {
     console.log(walletAddress);
     console.log(req.user.walletAddress);
     if (walletAddress != req.user.walletAddress) {
-      //throw new UnauthorizedException('Access denied from this wallet address');
+      throw new UnauthorizedException('Access denied from this wallet address');
     }
     const userId = req.user.userId;
     return this.stakingService.findAllFromUser(userId, walletAddress, paginationQuery);
@@ -88,7 +60,11 @@ export class StakingController {
     return { dailyReward: config.rewardAmount }
   }
 
-
-
-
+  @Get('staking/historys')
+  @ApiOperation({ summary: '히스토리 조회' })
+  @ApiResponse({ status: 200, description: '히스토리 반환', type: [StakingHistory] })
+  async getHistorys(@Query() paginationQuery: PaginationQueryDto, @Request() req): Promise<PaginationResponseDto> {
+    const userId = req.user.userId;
+    return this.stakingService.getHistorys(userId, paginationQuery);
+  }
 }

@@ -45,12 +45,14 @@ export class StakingService {
     return this.stakingConfigRepository.save(config);
   }
 
-  async join(userId: number, joinStakingDto: JoinStakingDto): Promise<Staking> {
-    const staking = this.stakingRepository.create({
-      userId,
+  async join(joinStakingDto: JoinStakingDto): Promise<Staking> {
+    console.log({joinStakingDto});
+    const staking = await this.stakingRepository.save({
       ...joinStakingDto
     });
-    return this.stakingRepository.save(staking);
+    console.log({staking});
+    await this.createHistory(staking.userId, staking.id, "Staked", null, null);
+    return staking;
   }
 
   //async findAllFromAdmin(page: number = 1, limit: number = 10) {
@@ -123,5 +125,27 @@ export class StakingService {
   async createHistory(userId: number, actionId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
     const history = this.stakingHistoryRepository.create({ userId, actionId, action, txHash, amount });
     return this.stakingHistoryRepository.save(history);
+  }
+
+  async getHistorys(userId: number, paginationQuery): Promise<any> {
+    const { page, limit } = paginationQuery;
+    const skip = (page - 1) * limit;
+
+    const [historys, total] = await this.stakingHistoryRepository.findAndCount({
+      where: { userId: userId },
+      order: { id: 'DESC' },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    return {
+      data: historys,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }
