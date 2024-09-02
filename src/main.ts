@@ -9,6 +9,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   
+  // CORS 설정 추가
+  app.enableCors({
+    origin: [
+      'https://admin.ricotoken.com', 
+      'http://admin.ricotoken.com',
+      // 필요한 경우 추가 도메인을 여기에 나열하세요
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+  });
+  
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
 
