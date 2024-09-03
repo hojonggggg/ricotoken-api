@@ -40,11 +40,18 @@ export class StakingController {
   }
 
   @Get('staking/historys')
-  @ApiOperation({ summary: '히스토리 조회' })
+  @ApiOperation({ summary: '히스토리 전체 조회' })
   @ApiResponse({ status: 200, description: '히스토리 반환', type: [StakingHistory] })
   async getHistorys(@Query() paginationQuery: PaginationQueryDto, @Request() req): Promise<PaginationResponseDto> {
     const userId = req.user.userId;
     return await this.stakingService.getHistorys(userId, paginationQuery);
+  }
+
+  @Get('staking/history/:nftId')
+  @ApiOperation({ summary: '히스토리 조회' })
+  @ApiResponse({ status: 200, type: [StakingHistory] })
+  async getHistory(@Param('nftId') nftId: number, @Query() paginationQuery: PaginationQueryDto, @Request() req): Promise<PaginationResponseDto> {
+    return await this.stakingService.getHistory(nftId, paginationQuery);
   }
 
   @Get('stakings')

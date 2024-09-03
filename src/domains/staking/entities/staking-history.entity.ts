@@ -11,6 +11,10 @@ export class StakingHistory {
   @Column({ name: 'user_id' })
   userId: number;
 
+  @ApiProperty()
+  @Column({ name: 'nft_id' })
+  nftId: number;
+
   @ApiProperty({ description: 'staking or claim table id' })
   @Column({ name: 'action_id' })
   actionId: number;

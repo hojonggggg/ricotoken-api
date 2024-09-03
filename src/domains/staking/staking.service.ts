@@ -57,7 +57,7 @@ export class StakingService {
       ...joinStakingDto
     });
     console.log({staking});
-    await this.createHistory(staking.userId, staking.id, "Staked", null, null);
+    await this.createHistory(staking.userId, staking.nftId, staking.id, "Staked", null, null);
     return staking;
   }
 
@@ -130,11 +130,11 @@ export class StakingService {
     }
     staking.status = 'Unstaked';
     await this.stakingRepository.save(staking);
-    await this.createHistory(userId, id, "Unstaked", txHash, null);
+    await this.createHistory(userId, staking.nftId, id, "Unstaked", txHash, null);
   }
 
-  async createHistory(userId: number, actionId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
-    const history = this.stakingHistoryRepository.create({ userId, actionId, action, txHash, amount });
+  async createHistory(userId: number, nftId: number, actionId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
+    const history = this.stakingHistoryRepository.create({ userId, nftId, actionId, action, txHash, amount });
     return this.stakingHistoryRepository.save(history);
   }
 
@@ -187,6 +187,28 @@ export class StakingService {
     };
   }
 
+  async getHistory(nftId: number, paginationQuery): Promise<any> {
+    const { page, limit } = paginationQuery;
+    const skip = (page - 1) * limit;
+
+    const [historys, total] = await this.stakingHistoryRepository.findAndCount({
+      where: { nftId: nftId },
+      order: { id: 'DESC' },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    return {
+      data: historys,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async getBalance(userId: number) {
     return this.stakingRepository.count({ where: { userId, status: 'Staked'}});
   }
@@ -200,6 +222,6 @@ export class StakingService {
     staking.receivedReward = newReceivedReward;
     staking.availableReward = newAvalableReward;
     await this.stakingRepository.save(staking);
-    await this.createHistory(userId, staking.id, 'Claim', txHash, availableReward.toString());
+    await this.createHistory(userId, staking.nftId, staking.id, 'Claim', txHash, availableReward.toString());
   }
 }
