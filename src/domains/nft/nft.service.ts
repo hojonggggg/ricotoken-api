@@ -21,7 +21,8 @@ export class NftService {
     });
     const nfts = {
       active: activeNfts || {},
-      inactive: inactiveNfts || {}
+      inactive: inactiveNfts || {},
+      reward: 0
     }
     return nfts;
   }

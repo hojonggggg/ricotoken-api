@@ -53,13 +53,11 @@ export class StakingService {
     return this.stakingConfigRepository.save(config);
   }
 
-  async join(joinStakingDto: JoinStakingDto): Promise<Staking> {
-    console.log({joinStakingDto});
+  async join(userId: number, walletAddress: string, joinStakingDto: JoinStakingDto): Promise<Staking> {
     const staking = await this.stakingRepository.save({
       ...joinStakingDto
     });
-    console.log({staking});
-    const { userId, nftId, txHash } = staking;
+    const { nftId, txHash } = joinStakingDto;
     const actionId = staking.id;
     const action = 'Staked';
     await this.nftService.updateNftStatus(nftId, 'INACTIVE');
@@ -142,11 +140,6 @@ export class StakingService {
     await this.createHistory(userId, nftId, id, "Unstaked", txHash, null);
   }
 
-  async createHistory(userId: number, nftId: number, actionId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
-    const history = this.stakingHistoryRepository.create({ userId, nftId, actionId, action, txHash, amount });
-    return this.stakingHistoryRepository.save(history);
-  }
-
   async getTotalStakingCount() {
     return 123;
   }
@@ -222,15 +215,27 @@ export class StakingService {
     return this.stakingRepository.count({ where: { userId, status: 'Staked'}});
   }
 
-  async claim(userId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
-    const { id, txHash } = claimStakingDto;
-    const staking = await this.stakingRepository.findOne({ where: { id }});
+  async claims(userId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
+    
+  }
+
+  async claim(userId: number, nftId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
+    const { txHash } = claimStakingDto;
+    const staking = await this.stakingRepository.findOne({ where: { userId, nftId, status: 'Staked' }});
+    const stakingId = staking.id;
     const { receivedReward, availableReward } = staking;
     const newReceivedReward = (+receivedReward) + (+availableReward);
     const newAvalableReward = 0;
     staking.receivedReward = newReceivedReward;
     staking.availableReward = newAvalableReward;
+    const actionId = staking.id;
+    const action = 'Claim';
+    const amount = availableReward.toString();
     await this.stakingRepository.save(staking);
-    await this.createHistory(userId, staking.nftId, staking.id, 'Claim', txHash, availableReward.toString());
+    await this.createHistory(stakingId, userId, nftId, action, txHash, amount);
+  }
+
+  async createHistory(stakingId: number, userId: number, nftId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
+    return await this.stakingHistoryRepository.save({stakingId, userId, nftId, action, txHash, amount});
   }
 }

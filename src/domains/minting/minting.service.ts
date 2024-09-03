@@ -37,10 +37,17 @@ export class MintingService {
     const minting = this.mintingRepository.create({
       ...createMintingDto
     });
+
+    const remainingSupply = await this.getRemainingSupply();
+    const amount = minting.amount;
+    const newRemainingSupply = remainingSupply - amount;
+    
+    ////수량 적용
+
+
     return this.mintingRepository.save(minting);
   }
 
-  //async findAll(page: number = 1, limit: number = 10) {
   async findAll(paginationQuery) {
     const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;

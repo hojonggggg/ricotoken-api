@@ -76,18 +76,25 @@ export class StakingController {
   @ApiResponse({ status: 200, type: [Staking] })
   async join(@Body() joinStakingDto: JoinStakingDto, @Request() req) {
     const { userId, walletAddress } = req.user;
-    joinStakingDto.userId = userId;
-    joinStakingDto.walletAddress = walletAddress;
-    return await this.stakingService.join(joinStakingDto);
+    return await this.stakingService.join(userId, walletAddress, joinStakingDto);
   }
 
-  @Patch('staking/claim')
-  @ApiOperation({ summary: '보상 수령' })
+  @Patch('staking/claims')
+  @ApiOperation({ summary: '보상 전체 수령' })
   @ApiResponse({ status: 200 })
-  async claim(@Body() claimStakingDto: ClaimStakingDto, @Request() req) {
-    const userId = req.user.userId;
-    await this.stakingService.claim(userId, claimStakingDto);
-    return { message: 'Successfully received reward' };
+  async claims(@Body() claimStakingDto: ClaimStakingDto, @Request() req) {
+    const { userId } = req.user;
+    await this.stakingService.claims(userId, claimStakingDto);
+    return { message: 'SUCCESS' };
+  }
+
+  @Patch('staking/claim/:nftId')
+  @ApiOperation({ summary: '보상 개별 수령' })
+  @ApiResponse({ status: 200 })
+  async claim(@Param('nftId') nftId: number, @Body() claimStakingDto: ClaimStakingDto, @Request() req) {
+    const { userId } = req.user;
+    await this.stakingService.claim(userId, nftId, claimStakingDto);
+    return { message: 'SUCCESS' };
   }
 
   @Patch('staking/unstaked')

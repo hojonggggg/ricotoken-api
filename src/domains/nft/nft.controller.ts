@@ -11,7 +11,7 @@ export class NftController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: '보유한 NFT 전체 조회', description: 'ACTIVE: 민팅 가능한 상태<br/>INACTIVE: 민팅 불가능한 상태' })
+  @ApiOperation({ summary: '보유한 NFT 전체 조회', description: 'active: 민팅 가능한 상태<br/>inactive: 민팅 불가능한 상태<br/>reward: 수령 가능한 보상' })
   @ApiResponse({ status: 200 }) 
   async findNftsByUserId(@Request() req): Promise<any> {
     const { userId } = req.user;
