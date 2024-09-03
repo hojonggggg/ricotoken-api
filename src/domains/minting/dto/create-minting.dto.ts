@@ -21,9 +21,13 @@ export class CreateMintingDto {
   @IsString()
   fiat: string;
     
-  @ApiProperty({ example: '25000', description: '구매 가격' })
+  @ApiProperty({ example: '25000000000000000000000', description: '구매 가격' })
+  @IsString()
+  balance: string;
+    
+  @ApiProperty({ example: 1, description: '구매 수량' })
   @IsNumber()
-  balance: number;
+  amount: number;
 
   userId: number;
   walletAddress: string;

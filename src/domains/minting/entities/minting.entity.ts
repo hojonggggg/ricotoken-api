@@ -20,8 +20,11 @@ export class Minting {
   @Column()
   fiat: string;
 
-  @Column('decimal', { precision: 18, scale: 5 })
-  balance: number;
+  @Column()
+  balance: string;
+
+  @Column()
+  amount: number;
   
   @Column()
   status: string;
