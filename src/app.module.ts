@@ -6,6 +6,7 @@ import { AuthModule } from './domains/auth/auth.module';
 import { AdminsModule } from './domains/admins/admins.module';
 import { MintingModule } from './domains/minting/minting.module';
 import { StakingModule } from './domains/staking/staking.module';
+import { NftModule } from './domains/nft/nft.module';
 import configuration from './commons/config/configuration';
 import * as moment from 'moment-timezone';
 
@@ -37,7 +38,8 @@ import * as moment from 'moment-timezone';
     AdminsModule,
     UsersModule,
     MintingModule,
-    StakingModule,
+    NftModule,
+    StakingModule
   ],
 })
 export class AppModule {}
