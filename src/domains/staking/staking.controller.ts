@@ -18,12 +18,12 @@ import { PaginationResponseDto } from './dto/pagination-response.dto';
 
 @ApiTags('staking')
 @Controller()
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class StakingController {
   constructor(private readonly stakingService: StakingService) {}
 
   @Get('staking/balance')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '스테이킹 중인 NFT 개수' })
   @ApiResponse({ status: 200 })
   async getBalance(@Request() req): Promise<{ stakingBalance: number }> {
@@ -40,6 +40,8 @@ export class StakingController {
   }
 
   @Get('staking/historys')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '히스토리 전체 조회' })
   @ApiResponse({ status: 200, description: '히스토리 반환', type: [StakingHistory] })
   async getHistorys(@Query() paginationQuery: PaginationQueryDto, @Request() req): Promise<PaginationResponseDto> {
@@ -48,6 +50,8 @@ export class StakingController {
   }
 
   @Get('staking/history/:nftId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '히스토리 조회' })
   @ApiResponse({ status: 200, type: [StakingHistory] })
   async getHistory(@Param('nftId') nftId: number, @Query() paginationQuery: PaginationQueryDto, @Request() req): Promise<PaginationResponseDto> {
@@ -56,6 +60,8 @@ export class StakingController {
   }
 
   @Get('stakings')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '스테이킹 전체 조회' })
   @ApiResponse({ status: 200, type: [Staking] })
   async findAllFromUser(@Query() paginationQuery: PaginationQueryDto, @Request() req) {
@@ -64,6 +70,8 @@ export class StakingController {
   }
 
   @Get('staking/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '스테이킹 조회' })
   @ApiResponse({ status: 200, type: [Staking] })
   async find(@Param('id') id: number, @Request() req) {
@@ -72,6 +80,8 @@ export class StakingController {
   }
 
   @Post('staking')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '스테이킹 참여' })
   @ApiResponse({ status: 200, type: [Staking] })
   async join(@Body() joinStakingDto: JoinStakingDto, @Request() req) {
@@ -80,6 +90,8 @@ export class StakingController {
   }
 
   @Patch('staking/claims')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '보상 전체 수령' })
   @ApiResponse({ status: 200 })
   async claims(@Body() claimStakingDto: ClaimStakingDto, @Request() req) {
@@ -89,6 +101,8 @@ export class StakingController {
   }
 
   @Patch('staking/claim/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '보상 개별 수령' })
   @ApiResponse({ status: 200 })
   async claim(@Param('id') id: number, @Body() claimStakingDto: ClaimStakingDto, @Request() req) {
@@ -98,6 +112,8 @@ export class StakingController {
   }
 
   @Patch('staking/unstakeds')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '스테이킹 전체 해지' })
   @ApiResponse({ status: 200 })
   async cancels(@Body() canelStakingDto: CancelStakingDto, @Request() req) {
@@ -107,6 +123,8 @@ export class StakingController {
   }
 
   @Patch('staking/unstaked/')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '스테이킹 개별 해지' })
   @ApiResponse({ status: 200 })
   async cancel(@Body() canelStakingDto: CancelStakingDto, @Request() req) {

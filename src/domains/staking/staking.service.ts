@@ -216,7 +216,6 @@ export class StakingService {
   }
 
   async claims(userId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
-    //const stakings = await this.stakingRepository.find({ where: { userId, status: 'Staked' } });
     const totalReward = await this.stakingRepository
       .createQueryBuilder("stakings")
       .select("SUM(stakings.reward)", "totalReward")
@@ -224,15 +223,22 @@ export class StakingService {
       .andWhere("stakings.status = :status", { status: 'Staked' })
       .getRawOne();
     console.log({totalReward});
+
+    await this.stakingRepository.update({ userId, status:'Staked' }, { reward: 0 });
+    
+    const { txHash } = claimStakingDto;
+    const action = 'Claim';
+    const amount = totalReward.toString();
+    await this.createHistory(null, userId, null, action, txHash, amount);
   }
 
   async claim(userId: number, id: number, claimStakingDto: ClaimStakingDto): Promise<void> {
-    const { txHash } = claimStakingDto;
     const staking = await this.stakingRepository.findOne({ where: { id, userId }});
     const stakingId = id;
     const { nftId, reward } = staking;
     staking.reward = 0;
     await this.stakingRepository.save(staking);
+    const { txHash } = claimStakingDto;
     const action = 'Claim';
     const amount = reward.toString();
     await this.createHistory(stakingId, userId, nftId, action, txHash, amount);
