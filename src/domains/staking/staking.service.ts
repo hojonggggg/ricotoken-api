@@ -6,6 +6,7 @@ import { StakingConfig } from './entities/staking-config.entity';
 import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
 import { AdminsService } from '../admins/admins.service';
 import { MintingService } from '../minting/minting.service';
+import { NftService } from '../nft/nft.service';
 import { JoinStakingDto } from './dto/join-staking.dto';
 import { CancelStakingDto } from './dto/cancel-staking.dto';
 import { ClaimStakingDto } from './dto/claim-staking.dto';
@@ -25,6 +26,7 @@ export class StakingService {
     private stakingHistoryRepository: Repository<StakingHistory>,
     private adminsService: AdminsService,
     private mintingService: MintingService,
+    private nftService: NftService,
   ) {}
 
   async getStakingConfig(): Promise<StakingConfig> {
@@ -57,7 +59,11 @@ export class StakingService {
       ...joinStakingDto
     });
     console.log({staking});
-    await this.createHistory(staking.userId, staking.nftId, staking.id, "Staked", null, null);
+    const { userId, nftId, txHash } = staking;
+    const actionId = staking.id;
+    const action = 'Staked';
+    await this.nftService.updateNftStatus(nftId, 'INACTIVE');
+    await this.createHistory(userId, nftId, actionId, action, txHash, null);
     return staking;
   }
 
@@ -130,7 +136,10 @@ export class StakingService {
     }
     staking.status = 'Unstaked';
     await this.stakingRepository.save(staking);
-    await this.createHistory(userId, staking.nftId, id, "Unstaked", txHash, null);
+
+    const nftId = staking.nftId;
+    await this.nftService.updateNftStatus(nftId, 'ACTIVE');
+    await this.createHistory(userId, nftId, id, "Unstaked", txHash, null);
   }
 
   async createHistory(userId: number, nftId: number, actionId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {

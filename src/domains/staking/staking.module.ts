@@ -10,6 +10,8 @@ import { StakingHistory } from './entities/staking-history.entity';
 import { MintingService } from '../minting/minting.service';
 import { Minting } from '../minting/entities/minting.entity';
 import { MintingConfig } from '../minting/entities/minting-config.entity';
+import { NftService } from '../nft/nft.service';
+import { Nft } from '../nft/entities/nft.entity';
 import { AllowedIp } from '../admins/entities/allowed-ip.entity';
 import { AdminLog } from '../admins/entities/admin-log.entity';
 
@@ -18,15 +20,16 @@ import { AdminLog } from '../admins/entities/admin-log.entity';
     TypeOrmModule.forFeature([
       AllowedIp, 
       AdminLog, 
+      Minting, 
+      MintingConfig, 
+      Nft,  
       Staking, 
       StakingConfig, 
       StakingStat, 
-      StakingHistory, 
-      Minting, 
-      MintingConfig
+      StakingHistory
     ]
   )],
-  providers: [AdminsService, StakingService, MintingService],
+  providers: [AdminsService, StakingService, MintingService, NftService],
   controllers: [StakingController],
   exports: [StakingService],
 })

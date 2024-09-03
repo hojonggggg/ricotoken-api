@@ -7,9 +7,11 @@ export class CreateMintingDto {
   @IsString()
   walletAddress: string;
   */
+  /*
   @ApiProperty({ example: 123, description: 'NFT 토큰 ID' })
   @IsNumber()
   nftId: number;
+  */
     
   @ApiProperty({ example: '0x123', description: '트랜잭션 해시' })
   @IsString()

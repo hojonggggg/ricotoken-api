@@ -3,10 +3,10 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity('nfts')
 export class Nft {
   @PrimaryGeneratedColumn()
-  id: number;
+  uid: number;
   
-  @Column({ name: 'token_id' })
-  tokenId: number;
+  @Column({ name: 'nft_id' })
+  nftId: number;
   
   @Column({ name: 'user_id' })
   userId: number;
