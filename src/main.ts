@@ -14,6 +14,8 @@ async function bootstrap() {
     origin: [
       'https://admin.ricotoken.com', 
       'http://admin.ricotoken.com',
+      'https://nft.ricotoken.com', 
+      'http://nft.ricotoken.com',
       // 필요한 경우 추가 도메인을 여기에 나열하세요
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
