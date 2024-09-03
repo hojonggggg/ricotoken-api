@@ -219,9 +219,9 @@ export class StakingService {
     //const stakings = await this.stakingRepository.find({ where: { userId, status: 'Staked' } });
     const totalReward = await this.stakingRepository
       .createQueryBuilder("stakings")
-      .select("SUM(staking.reward)", "totalReward")
-      .where("staking.userId = :userId", { userId })
-      .andWhere("staking.status = :status", { status: 'Staked' })
+      .select("SUM(stakings.reward)", "totalReward")
+      .where("stakings.userId = :userId", { userId })
+      .andWhere("stakings.status = :status", { status: 'Staked' })
       .getRawOne();
     console.log({totalReward});
   }
