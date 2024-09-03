@@ -187,12 +187,12 @@ export class StakingService {
     };
   }
 
-  async getHistory(nftId: number, paginationQuery): Promise<any> {
+  async getHistory(userId: number, nftId: number, paginationQuery): Promise<any> {
     const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;
 
     const [historys, total] = await this.stakingHistoryRepository.findAndCount({
-      where: { nftId: nftId },
+      where: { userId, nftId },
       order: { id: 'DESC' },
       take: limit,
       skip: (page - 1) * limit,
