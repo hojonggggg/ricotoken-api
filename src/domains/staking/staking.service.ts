@@ -212,26 +212,29 @@ export class StakingService {
   }
 
   async getBalance(userId: number) {
-    return this.stakingRepository.count({ where: { userId, status: 'Staked'}});
+    return this.stakingRepository.count({ where: { userId, status: 'Staked' } });
   }
 
   async claims(userId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
-    
+    //const stakings = await this.stakingRepository.find({ where: { userId, status: 'Staked' } });
+    const totalReward = await this.stakingRepository
+      .createQueryBuilder("stakings")
+      .select("SUM(staking.reward)", "totalReward")
+      .where("staking.userId = :userId", { userId })
+      .andWhere("staking.status = :status", { status: 'Staked' })
+      .getRawOne();
+    console.log({totalReward});
   }
 
-  async claim(userId: number, nftId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
+  async claim(userId: number, id: number, claimStakingDto: ClaimStakingDto): Promise<void> {
     const { txHash } = claimStakingDto;
-    const staking = await this.stakingRepository.findOne({ where: { userId, nftId, status: 'Staked' }});
-    const stakingId = staking.id;
-    const { receivedReward, availableReward } = staking;
-    const newReceivedReward = (+receivedReward) + (+availableReward);
-    const newAvalableReward = 0;
-    staking.receivedReward = newReceivedReward;
-    staking.availableReward = newAvalableReward;
-    const actionId = staking.id;
-    const action = 'Claim';
-    const amount = availableReward.toString();
+    const staking = await this.stakingRepository.findOne({ where: { id, userId }});
+    const stakingId = id;
+    const { nftId, reward } = staking;
+    staking.reward = 0;
     await this.stakingRepository.save(staking);
+    const action = 'Claim';
+    const amount = reward.toString();
     await this.createHistory(stakingId, userId, nftId, action, txHash, amount);
   }
 

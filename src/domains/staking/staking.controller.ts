@@ -88,17 +88,26 @@ export class StakingController {
     return { message: 'SUCCESS' };
   }
 
-  @Patch('staking/claim/:nftId')
+  @Patch('staking/claim/:id')
   @ApiOperation({ summary: '보상 개별 수령' })
   @ApiResponse({ status: 200 })
-  async claim(@Param('nftId') nftId: number, @Body() claimStakingDto: ClaimStakingDto, @Request() req) {
+  async claim(@Param('id') id: number, @Body() claimStakingDto: ClaimStakingDto, @Request() req) {
     const { userId } = req.user;
-    await this.stakingService.claim(userId, nftId, claimStakingDto);
+    await this.stakingService.claim(userId, id, claimStakingDto);
     return { message: 'SUCCESS' };
   }
 
-  @Patch('staking/unstaked')
-  @ApiOperation({ summary: '스테이킹 해지' })
+  @Patch('staking/unstakeds')
+  @ApiOperation({ summary: '스테이킹 전체 해지' })
+  @ApiResponse({ status: 200 })
+  async cancels(@Body() canelStakingDto: CancelStakingDto, @Request() req) {
+    const userId = req.user.userId;
+    await this.stakingService.cancel(userId, canelStakingDto);
+    return { message: 'Staking successfully unstaked' };
+  }
+
+  @Patch('staking/unstaked/')
+  @ApiOperation({ summary: '스테이킹 개별 해지' })
   @ApiResponse({ status: 200 })
   async cancel(@Body() canelStakingDto: CancelStakingDto, @Request() req) {
     const userId = req.user.userId;

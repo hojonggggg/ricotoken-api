@@ -21,9 +21,6 @@ export class Staking {
   @Column()
   status: string;
 
-  @Column('decimal', { precision: 18, scale: 5, name: 'received_reward' })
-  receivedReward: number;
-
-  @Column('decimal', { precision: 18, scale: 5, name: 'available_reward' })
-  availableReward: number;
+  @Column('decimal', { precision: 18, scale: 5 })
+  reward: number;
 }
