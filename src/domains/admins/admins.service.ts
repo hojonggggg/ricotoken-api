@@ -28,7 +28,14 @@ export class AdminsService {
   }
 
   async getAllAllowedIps(): Promise<AllowedIp[]> {
-    return this.allowedIpsRepository.find();
+    const allowedIps = await this.allowedIpsRepository.find({
+      select: ['ip']
+    });
+  
+    return allowedIps.map(item => ({
+      ...item,
+      ip: item.ip.replace(/^::ffff:/, '')
+    }));
   }
 
   async removeAllowedIp(userId: number, id: number, adminIp: string): Promise<void> {

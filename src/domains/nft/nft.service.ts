@@ -12,11 +12,11 @@ export class NftService {
 
   async findNftsByUserId(userId: number): Promise<any> {
     const activeNfts = await this.nftRepository.find({ 
-      select : ['nftId'],
+      select: ['nftId'],
       where: { userId, status: 'ACTIVE' } 
     });
     const inactiveNfts = await this.nftRepository.find({ 
-      select : ['nftId'],
+      select: ['nftId'],
       where: { userId, status: 'INACTIVE' } 
     });
     const nfts = {
