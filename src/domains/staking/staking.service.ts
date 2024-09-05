@@ -331,11 +331,13 @@ export class StakingService {
       const staking = await this.stakingRepository.findOne({ where: { id: stakingId, userId }});
       const { reward } = staking;
       staking.reward = 0;
+      const balance = convertToDecimal18(reward);
+
       await this.stakingRepository.save(staking);
       await this.claimRepository.save({
         userId,
         walletAddress,
-        amount: reward,
+        balance,
         status: 'WAIT'
       });
       /*
