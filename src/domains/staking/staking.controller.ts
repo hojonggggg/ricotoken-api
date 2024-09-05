@@ -110,7 +110,7 @@ export class StakingController {
     await this.stakingService.claim(userId, walletAddress, stakingId);
     return { message: 'SUCCESS' };
   }
-
+  /*
   @Patch('staking/unstakeds')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -121,7 +121,7 @@ export class StakingController {
     await this.stakingService.cancelMintings(userId, canelStakingsDto);
     return { message: 'Staking successfully unstaked' };
   }
-
+  */
   @Patch('staking/unstaked/')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

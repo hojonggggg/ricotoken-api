@@ -286,12 +286,13 @@ export class StakingService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      const totalReward = await this.stakingRepository
+      const staking = await this.stakingRepository
         .createQueryBuilder("stakings")
         .select("SUM(stakings.reward)", "totalReward")
         .where("stakings.userId = :userId", { userId })
         .andWhere("stakings.status = :status", { status: 'Staked' })
         .getRawOne();
+      const { totalReward } = staking;
       console.log({totalReward});
       const balance = convertToDecimal18(totalReward);
       console.log({balance});
