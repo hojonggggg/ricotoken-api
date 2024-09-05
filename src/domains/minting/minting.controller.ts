@@ -29,7 +29,7 @@ export class MintingController {
 
   @Get('is-active')
   @ApiOperation({ summary: 'NFT 판매 상태' })
-  @ApiResponse({ status: 200, type: MintingConfig })
+  @ApiResponse({ status: 200 })
   async getIsActive() {
     const config = await this.mintingService.getMintingConfig();
     return { isActive: config.isMintingActive };

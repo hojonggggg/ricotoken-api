@@ -58,6 +58,12 @@ export class MintingService {
     /*
      * 민팅 가능 상태 확인
      */
+    const mintingConfig = await this.getMintingConfig();
+    const isMintingActive = mintingConfig.isMintingActive;
+
+    if (!isMintingActive) {
+      throw new Error('Minting inactive');
+    }
 
     const { fiat, amount } = createMintingStep1Dto;
     const price = await calcPrice(fiat, amount);

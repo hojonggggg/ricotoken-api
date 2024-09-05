@@ -279,7 +279,7 @@ export class StakingService {
     return this.stakingRepository.count({ where: { userId, status: 'Staked' } });
   }
 
-  async claims(userId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
+  async claims(userId: number, walletAddress: string): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();
@@ -294,12 +294,19 @@ export class StakingService {
       console.log({totalReward});
 
       await this.stakingRepository.update({ userId, status:'Staked' }, { reward: 0 });
+      await this.claimRepository.save({
+        userId,
+        walletAddress,
+        amount: totalReward,
+        status: 'WAIT'
+      });
       
+      /*
       const { txHash } = claimStakingDto;
       const action = 'Claim';
       const amount = totalReward.toString();
       await this.createHistory(userId, action, txHash, amount);
-
+      */
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -309,7 +316,7 @@ export class StakingService {
     }
   }
 
-  async claim(userId: number, stakingId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
+  async claim(userId: number, walletAddress: string, stakingId: number): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();
@@ -321,11 +328,19 @@ export class StakingService {
       const { reward } = staking;
       staking.reward = 0;
       await this.stakingRepository.save(staking);
+      await this.claimRepository.save({
+        userId,
+        walletAddress,
+        amount: reward,
+        status: 'WAIT'
+      });
+      /*
       const { txHash } = claimStakingDto;
       const action = 'Claim';
       const amount = reward.toString();
       await this.createHistory(userId, action, txHash, amount);
-
+      */
+     
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();

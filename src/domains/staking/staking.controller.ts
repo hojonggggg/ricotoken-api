@@ -94,9 +94,9 @@ export class StakingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '보상 전체 수령' })
   @ApiResponse({ status: 200 })
-  async claims(@Body() claimStakingDto: ClaimStakingDto, @Request() req) {
-    const { userId } = req.user;
-    await this.stakingService.claims(userId, claimStakingDto);
+  async claims(@Request() req) {
+    const { userId, walletAddress } = req.user;
+    await this.stakingService.claims(userId, walletAddress);
     return { message: 'SUCCESS' };
   }
 
@@ -105,9 +105,9 @@ export class StakingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '보상 개별 수령' })
   @ApiResponse({ status: 200 })
-  async claim(@Param('stakingId') stakingId: number, @Body() claimStakingDto: ClaimStakingDto, @Request() req) {
-    const { userId } = req.user;
-    await this.stakingService.claim(userId, stakingId, claimStakingDto);
+  async claim(@Param('stakingId') stakingId: number, @Request() req) {
+    const { userId, walletAddress } = req.user;
+    await this.stakingService.claim(userId, walletAddress, stakingId);
     return { message: 'SUCCESS' };
   }
 
