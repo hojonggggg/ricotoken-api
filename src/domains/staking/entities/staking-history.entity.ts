@@ -22,4 +22,8 @@ export class StakingHistory {
   @ApiProperty()
   @Column({ name: 'tx_hash' })
   txHash: string;
+
+  @ApiProperty()
+  @Column({ name: 'created_at' })
+  createdAt: Date;
 }

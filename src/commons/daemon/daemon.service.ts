@@ -24,6 +24,14 @@ export class DaemonService {
     private mintingRepository: Repository<Minting>,
   ) {}
 
+  async test() {
+    const contractAddress = '0xdDd59c4eCf09E0b6E7F8f3B73518A41dB12Bd71b';
+    const stakeAbi = ["function stake(uint nftId)"];
+    const contract = new ethers.Contract(contractAddress, stakeAbi, provider);
+    console.log({contract});
+
+  }
+
   async mintingScan() {
     const queryRunner = this.dataSource.createQueryRunner();
     try {
@@ -114,5 +122,6 @@ export class DaemonService {
     //console.log({ currentTime });
 
     await this.mintingScan();
+    //await this.test();
   }
 }
