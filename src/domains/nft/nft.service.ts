@@ -31,7 +31,13 @@ export class NftService {
     return nfts;
   }
 
-  async updateNftStatus(nftId: number, status: string) {
-    await this.nftRepository.update({ nftId }, { status });
+  async updateNftStatusByNftId(nftId: number, status: string, newStatus: string) {
+    await this.nftRepository.update({ nftId, status }, { status: newStatus });
   }
+
+  async updateNftsStatusByUserId(userId: number, status: string, newStatus: string) {
+    await this.nftRepository.update({ userId, status }, { status: newStatus });
+  }
+
+
 }

@@ -8,7 +8,7 @@ import { AdminsService } from '../admins/admins.service';
 import { MintingService } from '../minting/minting.service';
 import { NftService } from '../nft/nft.service';
 import { JoinStakingDto } from './dto/join-staking.dto';
-import { CancelStakingDto } from './dto/cancel-staking.dto';
+import { CancelStakingDto, CancelStakingsDto } from './dto/cancel-staking.dto';
 import { ClaimStakingDto } from './dto/claim-staking.dto';
 import { StakingStat } from './entities/staking-stat.entity';
 import { StakingHistory } from './entities/staking-history.entity';
@@ -54,6 +54,9 @@ export class StakingService {
   }
 
   async join(userId: number, walletAddress: string, joinStakingDto: JoinStakingDto): Promise<Staking> {
+
+    //NFT ACTIVE 상태 확인
+
     const staking = await this.stakingRepository.save({
       userId, 
       walletAddress, 
@@ -62,8 +65,8 @@ export class StakingService {
     const { nftId, txHash } = joinStakingDto;
     const actionId = staking.id;
     const action = 'Staked';
-    await this.nftService.updateNftStatus(nftId, 'INACTIVE');
-    await this.createHistory(userId, nftId, actionId, action, txHash, null);
+    await this.nftService.updateNftStatusByNftId(nftId, 'ACTIVE', 'INACTIVE');
+    await this.createHistory(userId, action, txHash, null);
     return staking;
   }
 
@@ -128,7 +131,7 @@ export class StakingService {
     };
   }
 
-  async cancel(userId: number, cancelStakingDto: CancelStakingDto): Promise<void> {
+  async cancelMinting(userId: number, cancelStakingDto: CancelStakingDto): Promise<void> {
     const { id, txHash } = cancelStakingDto;
     const staking = await this.stakingRepository.findOne({ where: { id, userId } });
     if (!staking) {
@@ -138,8 +141,25 @@ export class StakingService {
     await this.stakingRepository.save(staking);
 
     const nftId = staking.nftId;
-    await this.nftService.updateNftStatus(nftId, 'ACTIVE');
-    await this.createHistory(userId, nftId, id, "Unstaked", txHash, null);
+    const nftStatus = 'INACTIVE';
+    const newNftStatus = 'ACTIVE';
+
+    await this.nftService.updateNftStatusByNftId(nftId, nftStatus, newNftStatus);
+    await this.createHistory(userId, "Unstaked", txHash, null);
+  }
+
+  async cancelMintings(userId: number, cancelStakingsDto: CancelStakingsDto): Promise<void> {
+    const { txHash } = cancelStakingsDto;
+
+    const stakingStatus = 'Staked';
+    const newStakingStatus = 'Unstaked';
+    await this.stakingRepository.update({ userId, status: stakingStatus }, { status: newStakingStatus });
+
+    const nftStatus = 'ACTIVE';
+    const newNftStatus = 'INACTIVE';
+    //await this.nftService.updateNftStatus(nftId, 'ACTIVE');
+    await this.nftService.updateNftsStatusByUserId(userId, nftStatus, newNftStatus);
+    await this.createHistory(userId, "Unstaked", txHash, null);
   }
 
   async getTotalStakingCount() {
@@ -231,7 +251,7 @@ export class StakingService {
     const { txHash } = claimStakingDto;
     const action = 'Claim';
     const amount = totalReward.toString();
-    await this.createHistory(null, userId, null, action, txHash, amount);
+    await this.createHistory(userId, action, txHash, amount);
   }
 
   async claim(userId: number, id: number, claimStakingDto: ClaimStakingDto): Promise<void> {
@@ -243,10 +263,10 @@ export class StakingService {
     const { txHash } = claimStakingDto;
     const action = 'Claim';
     const amount = reward.toString();
-    await this.createHistory(stakingId, userId, nftId, action, txHash, amount);
+    await this.createHistory(userId, action, txHash, amount);
   }
 
-  async createHistory(stakingId: number, userId: number, nftId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
-    return await this.stakingHistoryRepository.save({stakingId, userId, nftId, action, txHash, amount});
+  async createHistory(userId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
+    return await this.stakingHistoryRepository.save({userId, action, txHash, amount});
   }
 }

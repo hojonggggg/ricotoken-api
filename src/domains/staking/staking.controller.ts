@@ -12,7 +12,7 @@ import { StakingHistory } from './entities/staking-history.entity';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
 import { JoinStakingDto } from './dto/join-staking.dto';
-import { CancelStakingDto } from './dto/cancel-staking.dto';
+import { CancelStakingDto, CancelStakingsDto } from './dto/cancel-staking.dto';
 import { ClaimStakingDto } from './dto/claim-staking.dto';
 import { PaginationResponseDto } from './dto/pagination-response.dto';
 
@@ -116,9 +116,9 @@ export class StakingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '스테이킹 전체 해지' })
   @ApiResponse({ status: 200 })
-  async cancels(@Body() canelStakingDto: CancelStakingDto, @Request() req) {
+  async cancelMintings(@Body() canelStakingsDto: CancelStakingsDto, @Request() req) {
     const userId = req.user.userId;
-    await this.stakingService.cancel(userId, canelStakingDto);
+    await this.stakingService.cancelMintings(userId, canelStakingsDto);
     return { message: 'Staking successfully unstaked' };
   }
 
@@ -127,9 +127,9 @@ export class StakingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '스테이킹 개별 해지' })
   @ApiResponse({ status: 200 })
-  async cancel(@Body() canelStakingDto: CancelStakingDto, @Request() req) {
+  async cancelMinting(@Body() canelStakingDto: CancelStakingDto, @Request() req) {
     const userId = req.user.userId;
-    await this.stakingService.cancel(userId, canelStakingDto);
+    await this.stakingService.cancelMinting(userId, canelStakingDto);
     return { message: 'Staking successfully unstaked' };
   }
 }
