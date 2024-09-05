@@ -14,7 +14,7 @@ import { Claim } from './entities/claim.entity';
 import { ClaimStakingDto } from './dto/claim-staking.dto';
 import { StakingStat } from './entities/staking-stat.entity';
 import { StakingHistory } from './entities/staking-history.entity';
-import { convertToDecimal18 } from 'src/commons/shared/functions';
+import { convertToDecimal18, stringToBignumber } from 'src/commons/shared/functions';
 
 @Injectable()
 export class StakingService {
@@ -213,6 +213,12 @@ export class StakingService {
     return 12;
   }
 
+  async getClaimFee() {
+    const claimConfig = await this.getStakingConfig();
+    const { claimFee } = claimConfig;
+    return claimFee;
+  }
+
   async getStats(): Promise<any> {
     const stat = await this.stakingStatRepository.findOne({ where: { id: 1 } });
     const stats = {
@@ -294,8 +300,13 @@ export class StakingService {
         .getRawOne();
       const { totalReward } = staking;
       console.log({totalReward});
-      const balance = convertToDecimal18(totalReward);
-      console.log({balance});
+      let balance = convertToDecimal18(totalReward);
+      const claimFee = await this.getClaimFee();
+      console.log({balance, claimFee});
+
+      if (stringToBignumber(balance).isGreaterThan(stringToBignumber(claimFee))) {
+        balance = (stringToBignumber(balance).minus(stringToBignumber(claimFee))).toFixed();
+      }
 
       await this.stakingRepository.update({ userId, status:'Staked' }, { reward: 0 });
       await this.claimRepository.save({
@@ -331,7 +342,15 @@ export class StakingService {
       const staking = await this.stakingRepository.findOne({ where: { id: stakingId, userId }});
       const { reward } = staking;
       staking.reward = 0;
-      const balance = convertToDecimal18(reward);
+      let balance = convertToDecimal18(reward);
+
+      
+      const claimFee = await this.getClaimFee();
+      console.log({balance, claimFee});
+
+      if (stringToBignumber(balance).isGreaterThan(stringToBignumber(claimFee))) {
+        balance = (stringToBignumber(balance).minus(stringToBignumber(claimFee))).toFixed();
+      }
 
       await this.stakingRepository.save(staking);
       await this.claimRepository.save({

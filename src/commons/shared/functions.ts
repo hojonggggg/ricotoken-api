@@ -28,3 +28,7 @@ export const convertToDecimal18 = (amount) => {
   const result = new BigNumber(amount).times(factor);
   return result.toFixed();
 }
+
+export const stringToBignumber = (amount) => {
+  return new BigNumber(amount);
+}
