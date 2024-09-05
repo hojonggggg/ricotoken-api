@@ -100,14 +100,14 @@ export class StakingController {
     return { message: 'SUCCESS' };
   }
 
-  @Patch('staking/claim/:id')
+  @Patch('staking/claim/:stakingId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '보상 개별 수령' })
   @ApiResponse({ status: 200 })
-  async claim(@Param('id') id: number, @Body() claimStakingDto: ClaimStakingDto, @Request() req) {
+  async claim(@Param('stakingId') stakingId: number, @Body() claimStakingDto: ClaimStakingDto, @Request() req) {
     const { userId } = req.user;
-    await this.stakingService.claim(userId, id, claimStakingDto);
+    await this.stakingService.claim(userId, stakingId, claimStakingDto);
     return { message: 'SUCCESS' };
   }
 

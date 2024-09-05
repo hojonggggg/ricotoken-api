@@ -12,6 +12,7 @@ import { Minting } from '../minting/entities/minting.entity';
 import { MintingConfig } from '../minting/entities/minting-config.entity';
 import { NftService } from '../nft/nft.service';
 import { Nft } from '../nft/entities/nft.entity';
+import { Claim } from './entities/claim.entity';
 import { AllowedIp } from '../admins/entities/allowed-ip.entity';
 import { AdminLog } from '../admins/entities/admin-log.entity';
 
@@ -26,7 +27,8 @@ import { AdminLog } from '../admins/entities/admin-log.entity';
       Staking, 
       StakingConfig, 
       StakingStat, 
-      StakingHistory
+      StakingHistory,
+      Claim
     ]
   )],
   providers: [AdminsService, StakingService, MintingService, NftService],

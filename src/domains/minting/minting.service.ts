@@ -10,6 +10,8 @@ import {
 } from './dto/create-minting.dto';
 import { calcPrice, convert18Decimal } from 'src/commons/shared/functions';
 import { NftService } from '../nft/nft.service';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Injectable()
 export class MintingService {
@@ -56,7 +58,7 @@ export class MintingService {
     /*
      * 민팅 가능 상태 확인
      */
-    
+
     const { fiat, amount } = createMintingStep1Dto;
     const price = await calcPrice(fiat, amount);
     const priceTo18Decimal = await convert18Decimal(price);
@@ -77,7 +79,8 @@ export class MintingService {
 
 
     //return this.mintingRepository.save(minting);
-    return { id: minting.id, price: minting.price, fiat };
+    const _serviceWalletAddress = process.env.SERVICE_WALLET_ADDRESS;
+    return { id: minting.id, price: minting.price, fiat, toAddress: _serviceWalletAddress };
   }
 
   async mintingStep2(

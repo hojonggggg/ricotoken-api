@@ -10,6 +10,7 @@ import { MintingService } from '../minting/minting.service';
 import { NftService } from '../nft/nft.service';
 import { JoinStakingDto } from './dto/join-staking.dto';
 import { CancelStakingDto, CancelStakingsDto } from './dto/cancel-staking.dto';
+import { Claim } from './entities/claim.entity';
 import { ClaimStakingDto } from './dto/claim-staking.dto';
 import { StakingStat } from './entities/staking-stat.entity';
 import { StakingHistory } from './entities/staking-history.entity';
@@ -18,6 +19,9 @@ import { StakingHistory } from './entities/staking-history.entity';
 export class StakingService {
   constructor(
     private readonly dataSource: DataSource,
+    private adminsService: AdminsService,
+    private mintingService: MintingService,
+    private nftService: NftService,
     @InjectRepository(Staking)
     private stakingRepository: Repository<Staking>,
     @InjectRepository(StakingConfig)
@@ -26,9 +30,8 @@ export class StakingService {
     private stakingStatRepository: Repository<StakingStat>,
     @InjectRepository(StakingHistory)
     private stakingHistoryRepository: Repository<StakingHistory>,
-    private adminsService: AdminsService,
-    private mintingService: MintingService,
-    private nftService: NftService,
+    @InjectRepository(Claim)
+    private claimRepository: Repository<Claim>,
   ) {}
 
   async getStakingConfig(): Promise<StakingConfig> {
@@ -186,8 +189,8 @@ export class StakingService {
       const newStakingStatus = 'Unstaked';
       await this.stakingRepository.update({ userId, status: stakingStatus }, { status: newStakingStatus });
 
-      const nftStatus = 'ACTIVE';
-      const newNftStatus = 'INACTIVE';
+      const nftStatus = 'INACTIVE';
+      const newNftStatus = 'ACTIVE';
       //await this.nftService.updateNftStatus(nftId, 'ACTIVE');
       await this.nftService.updateNftsStatusByUserId(userId, nftStatus, newNftStatus);
       await this.createHistory(userId, "Unstaked", txHash, null);
@@ -306,15 +309,16 @@ export class StakingService {
     }
   }
 
-  async claim(userId: number, id: number, claimStakingDto: ClaimStakingDto): Promise<void> {
+  async claim(userId: number, stakingId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      const staking = await this.stakingRepository.findOne({ where: { id, userId }});
-      const stakingId = id;
-      const { nftId, reward } = staking;
+
+
+      const staking = await this.stakingRepository.findOne({ where: { id: stakingId, userId }});
+      const { reward } = staking;
       staking.reward = 0;
       await this.stakingRepository.save(staking);
       const { txHash } = claimStakingDto;

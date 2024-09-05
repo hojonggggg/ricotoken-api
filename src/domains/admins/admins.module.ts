@@ -15,9 +15,10 @@ import { Staking } from '../staking/entities/staking.entity';
 import { StakingConfig } from '../staking/entities/staking-config.entity';
 import { StakingStat } from '../staking/entities/staking-stat.entity';
 import { StakingHistory } from '../staking/entities/staking-history.entity';
+import { Claim } from '../staking/entities/claim.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AllowedIp, AdminLog, Minting, MintingConfig, Nft, Staking, StakingConfig, StakingStat, StakingHistory])],
+  imports: [TypeOrmModule.forFeature([AllowedIp, AdminLog, Minting, MintingConfig, Nft, Staking, StakingConfig, StakingStat, StakingHistory, Claim])],
   controllers: [AdminsController],
   providers: [AdminIpGuard, AdminsService, MintingService, NftService, StakingService],
   exports: [AdminIpGuard, AdminsService],
