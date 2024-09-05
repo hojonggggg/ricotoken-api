@@ -55,6 +55,8 @@ export class StakingService {
 
   async join(userId: number, walletAddress: string, joinStakingDto: JoinStakingDto): Promise<Staking> {
     const staking = await this.stakingRepository.save({
+      userId, 
+      walletAddress, 
       ...joinStakingDto
     });
     const { nftId, txHash } = joinStakingDto;

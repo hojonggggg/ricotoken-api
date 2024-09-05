@@ -99,7 +99,13 @@ export class DaemonService {
         }
       }
     }
-    
+  }
+
+  async minting() {
+    /*
+     * 수량 적용
+     * 민팅 후 상태는 ACTIVE
+     */
   }
 
   @Cron('*/3 * * * * *')
