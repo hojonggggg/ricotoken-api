@@ -12,7 +12,7 @@ const provider = new ethers.JsonRpcProvider(
 )
 import * as dotenv from 'dotenv';
 dotenv.config();
-import { convert18Decimal } from '../shared/functions';
+import { convertToDecimal18 } from '../shared/functions';
 
 @Injectable()
 export class DaemonService {
@@ -69,7 +69,7 @@ export class DaemonService {
         const txFrom = tx.from;
         const txTo = decodedData.args[0];
         const value = decodedData.args[1];
-        const txAmount = convert18Decimal(value);
+        const txAmount = convertToDecimal18(value);
 
         const _serviceWalletAddress = process.env.SERVICE_WALLET_ADDRESS;
         const _ricoWalletAddress = process.env.RICO_CONTRACT_ADDRESS;
@@ -111,7 +111,7 @@ export class DaemonService {
   @Cron('*/3 * * * * *')
   async handleDaemon() {
     const currentTime = new Date();
-    console.log({ currentTime });
+    //console.log({ currentTime });
 
     await this.mintingScan();
   }

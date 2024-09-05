@@ -8,7 +8,7 @@ import {
   CreateMintingStep1Dto,
   CreateMintingStep2Dto,
 } from './dto/create-minting.dto';
-import { calcPrice, convert18Decimal } from 'src/commons/shared/functions';
+import { calcPrice, convertToDecimal18 } from 'src/commons/shared/functions';
 import { NftService } from '../nft/nft.service';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -67,12 +67,12 @@ export class MintingService {
 
     const { fiat, amount } = createMintingStep1Dto;
     const price = await calcPrice(fiat, amount);
-    const priceTo18Decimal = await convert18Decimal(price);
+    const priceToDecimal18 = await convertToDecimal18(price);
 
     const minting = await this.mintingRepository.save({
       userId,
       walletAddress,
-      price: priceTo18Decimal,
+      price: priceToDecimal18,
       ...createMintingStep1Dto,
     });
 

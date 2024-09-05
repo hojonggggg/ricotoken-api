@@ -12,7 +12,7 @@ export class Claim {
   walletAddress: string;
 
   @Column()
-  amount: number;
+  balance: string;
 
   @Column({ name: 'tx_hash' })
   txHash: string;

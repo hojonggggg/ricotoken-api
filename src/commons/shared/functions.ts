@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 
 export const _ricoPrice = () => {
-  const ricoPrice = 25000;
+  const ricoPrice = 1;
   return ricoPrice;
 }
 
@@ -21,9 +21,10 @@ export const calcPrice = (fiat, amount) => {
   }
 }
 
-export const convert18Decimal = (amount) => {
+export const convertToDecimal18 = (amount) => {
   const _decimal = 18;
   const factor = new BigNumber(10).pow(_decimal);
-  const result = new BigNumber(amount).multipliedBy(factor);
+  //const result = new BigNumber(amount).multipliedBy(factor);
+  const result = new BigNumber(amount).times(factor);
   return result.toFixed();
 }

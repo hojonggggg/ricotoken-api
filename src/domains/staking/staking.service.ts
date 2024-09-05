@@ -14,6 +14,7 @@ import { Claim } from './entities/claim.entity';
 import { ClaimStakingDto } from './dto/claim-staking.dto';
 import { StakingStat } from './entities/staking-stat.entity';
 import { StakingHistory } from './entities/staking-history.entity';
+import { convertToDecimal18 } from 'src/commons/shared/functions';
 
 @Injectable()
 export class StakingService {
@@ -292,12 +293,14 @@ export class StakingService {
         .andWhere("stakings.status = :status", { status: 'Staked' })
         .getRawOne();
       console.log({totalReward});
+      const balance = convertToDecimal18(totalReward);
+      console.log({balance});
 
       await this.stakingRepository.update({ userId, status:'Staked' }, { reward: 0 });
       await this.claimRepository.save({
         userId,
         walletAddress,
-        amount: totalReward,
+        balance,
         status: 'WAIT'
       });
       
