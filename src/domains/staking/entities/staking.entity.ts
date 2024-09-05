@@ -12,9 +12,6 @@ export class Staking {
   @Column({ name: 'nft_id' })
   nftId: number;
 
-  @Column({ name: 'tx_hash' })
-  txHash: string;
-
   @Column({ name: 'wallet_address' })
   walletAddress: string;
 
