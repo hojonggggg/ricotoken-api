@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { Staking } from './entities/staking.entity';
 import { StakingConfig } from './entities/staking-config.entity';
 import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
@@ -16,6 +17,7 @@ import { StakingHistory } from './entities/staking-history.entity';
 @Injectable()
 export class StakingService {
   constructor(
+    private readonly dataSource: DataSource,
     @InjectRepository(Staking)
     private stakingRepository: Repository<Staking>,
     @InjectRepository(StakingConfig)
@@ -54,20 +56,31 @@ export class StakingService {
   }
 
   async join(userId: number, walletAddress: string, joinStakingDto: JoinStakingDto): Promise<Staking> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
-    //NFT ACTIVE 상태 확인
+      //NFT ACTIVE 상태 확인
 
-    const staking = await this.stakingRepository.save({
-      userId, 
-      walletAddress, 
-      ...joinStakingDto
-    });
-    const { nftId, txHash } = joinStakingDto;
-    const actionId = staking.id;
-    const action = 'Staked';
-    await this.nftService.updateNftStatusByNftId(nftId, 'ACTIVE', 'INACTIVE');
-    await this.createHistory(userId, action, txHash, null);
-    return staking;
+      const staking = await this.stakingRepository.save({
+        userId, 
+        walletAddress, 
+        ...joinStakingDto
+      });
+      const { nftId, txHash } = joinStakingDto;
+      const action = 'Staked';
+      await this.nftService.updateNftStatusByNftId(nftId, 'ACTIVE', 'INACTIVE');
+      await this.createHistory(userId, action, txHash, null);
+
+      await queryRunner.commitTransaction();
+      return staking;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   //async findAllFromAdmin(page: number = 1, limit: number = 10) {
@@ -132,34 +145,60 @@ export class StakingService {
   }
 
   async cancelMinting(userId: number, cancelStakingDto: CancelStakingDto): Promise<void> {
-    const { id, txHash } = cancelStakingDto;
-    const staking = await this.stakingRepository.findOne({ where: { id, userId } });
-    if (!staking) {
-      throw new NotFoundException(`Staking with ID "${id}" not found`);
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      const { id, txHash } = cancelStakingDto;
+      const staking = await this.stakingRepository.findOne({ where: { id, userId } });
+      if (!staking) {
+        throw new NotFoundException(`Staking with ID "${id}" not found`);
+      }
+      staking.status = 'Unstaked';
+      await this.stakingRepository.save(staking);
+
+      const nftId = staking.nftId;
+      const nftStatus = 'INACTIVE';
+      const newNftStatus = 'ACTIVE';
+
+      await this.nftService.updateNftStatusByNftId(nftId, nftStatus, newNftStatus);
+      await this.createHistory(userId, "Unstaked", txHash, null);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-    staking.status = 'Unstaked';
-    await this.stakingRepository.save(staking);
-
-    const nftId = staking.nftId;
-    const nftStatus = 'INACTIVE';
-    const newNftStatus = 'ACTIVE';
-
-    await this.nftService.updateNftStatusByNftId(nftId, nftStatus, newNftStatus);
-    await this.createHistory(userId, "Unstaked", txHash, null);
   }
 
   async cancelMintings(userId: number, cancelStakingsDto: CancelStakingsDto): Promise<void> {
-    const { txHash } = cancelStakingsDto;
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
-    const stakingStatus = 'Staked';
-    const newStakingStatus = 'Unstaked';
-    await this.stakingRepository.update({ userId, status: stakingStatus }, { status: newStakingStatus });
+      const { txHash } = cancelStakingsDto;
 
-    const nftStatus = 'ACTIVE';
-    const newNftStatus = 'INACTIVE';
-    //await this.nftService.updateNftStatus(nftId, 'ACTIVE');
-    await this.nftService.updateNftsStatusByUserId(userId, nftStatus, newNftStatus);
-    await this.createHistory(userId, "Unstaked", txHash, null);
+      const stakingStatus = 'Staked';
+      const newStakingStatus = 'Unstaked';
+      await this.stakingRepository.update({ userId, status: stakingStatus }, { status: newStakingStatus });
+
+      const nftStatus = 'ACTIVE';
+      const newNftStatus = 'INACTIVE';
+      //await this.nftService.updateNftStatus(nftId, 'ACTIVE');
+      await this.nftService.updateNftsStatusByUserId(userId, nftStatus, newNftStatus);
+      await this.createHistory(userId, "Unstaked", txHash, null);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async getTotalStakingCount() {
@@ -194,7 +233,7 @@ export class StakingService {
     const skip = (page - 1) * limit;
 
     const [historys, total] = await this.stakingHistoryRepository.findAndCount({
-      where: { userId: userId },
+      where: { userId },
       order: { id: 'DESC' },
       take: limit,
       skip: (page - 1) * limit,
@@ -216,7 +255,7 @@ export class StakingService {
     const skip = (page - 1) * limit;
 
     const [historys, total] = await this.stakingHistoryRepository.findAndCount({
-      where: { userId, nftId },
+      where: { userId },
       order: { id: 'DESC' },
       take: limit,
       skip: (page - 1) * limit,
@@ -238,35 +277,61 @@ export class StakingService {
   }
 
   async claims(userId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
-    const totalReward = await this.stakingRepository
-      .createQueryBuilder("stakings")
-      .select("SUM(stakings.reward)", "totalReward")
-      .where("stakings.userId = :userId", { userId })
-      .andWhere("stakings.status = :status", { status: 'Staked' })
-      .getRawOne();
-    console.log({totalReward});
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
-    await this.stakingRepository.update({ userId, status:'Staked' }, { reward: 0 });
-    
-    const { txHash } = claimStakingDto;
-    const action = 'Claim';
-    const amount = totalReward.toString();
-    await this.createHistory(userId, action, txHash, amount);
+      const totalReward = await this.stakingRepository
+        .createQueryBuilder("stakings")
+        .select("SUM(stakings.reward)", "totalReward")
+        .where("stakings.userId = :userId", { userId })
+        .andWhere("stakings.status = :status", { status: 'Staked' })
+        .getRawOne();
+      console.log({totalReward});
+
+      await this.stakingRepository.update({ userId, status:'Staked' }, { reward: 0 });
+      
+      const { txHash } = claimStakingDto;
+      const action = 'Claim';
+      const amount = totalReward.toString();
+      await this.createHistory(userId, action, txHash, amount);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async claim(userId: number, id: number, claimStakingDto: ClaimStakingDto): Promise<void> {
-    const staking = await this.stakingRepository.findOne({ where: { id, userId }});
-    const stakingId = id;
-    const { nftId, reward } = staking;
-    staking.reward = 0;
-    await this.stakingRepository.save(staking);
-    const { txHash } = claimStakingDto;
-    const action = 'Claim';
-    const amount = reward.toString();
-    await this.createHistory(userId, action, txHash, amount);
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      const staking = await this.stakingRepository.findOne({ where: { id, userId }});
+      const stakingId = id;
+      const { nftId, reward } = staking;
+      staking.reward = 0;
+      await this.stakingRepository.save(staking);
+      const { txHash } = claimStakingDto;
+      const action = 'Claim';
+      const amount = reward.toString();
+      await this.createHistory(userId, action, txHash, amount);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async createHistory(userId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
-    return await this.stakingHistoryRepository.save({userId, action, txHash, amount});
+    return await this.stakingHistoryRepository.create({userId, action, txHash, amount});
   }
 }

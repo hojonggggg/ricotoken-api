@@ -7,17 +7,9 @@ export class StakingHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({ description: 'staking id' })
-  @Column({ name: 'staking_id' })
-  stakingId: number;
-
   @ApiProperty({ example: 2, description: '' })
   @Column({ name: 'user_id' })
   userId: number;
-
-  @ApiProperty()
-  @Column({ name: 'nft_id' })
-  nftId: number;
 
   @ApiProperty({ description: 'Staked OR Unstaked OR Claim' })
   @Column()
