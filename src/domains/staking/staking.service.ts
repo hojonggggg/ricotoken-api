@@ -249,8 +249,17 @@ export class StakingService {
       skip: (page - 1) * limit,
     });
 
+    const transformedHistorys = historys.map(history => {
+      return {
+        ...history,
+        txHash: history.txHash ?? '', // column1이 null이면 빈 문자열로 대체
+        amount: history.amount ?? '', // column2도 동일하게 처리
+        // 추가로 처리할 다른 컬럼들
+      };
+    });
+
     return {
-      data: historys,
+      data: transformedHistorys,
       meta: {
         total,
         page,
