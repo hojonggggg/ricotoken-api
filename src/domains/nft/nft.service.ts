@@ -10,6 +10,10 @@ export class NftService {
     private nftRepository: Repository<Nft>,
   ) {}
 
+  async createNft(userId: number, walletAddress: string, mintingId: number) {
+    await this.nftRepository.save({ userId, walletAddress, mintingId });
+  }
+
   async findNftsByUserId(userId: number): Promise<any> {
     const activeNfts = await this.nftRepository.find({ 
       select: ['nftId'],

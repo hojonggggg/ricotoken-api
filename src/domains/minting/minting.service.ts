@@ -4,48 +4,104 @@ import { Repository } from 'typeorm';
 import { Minting } from './entities/minting.entity';
 import { MintingConfig } from './entities/minting-config.entity';
 import { UpdateMintingConfigDto } from './dto/update-minting-config.dto';
-import { CreateMintingDto } from './dto/create-minting.dto';
+import {
+  CreateMintingStep1Dto,
+  CreateMintingStep2Dto,
+} from './dto/create-minting.dto';
+import { calcPrice, convert18Decimal } from 'src/commons/shared/functions';
+import { NftService } from '../nft/nft.service';
 
 @Injectable()
 export class MintingService {
   constructor(
+    private readonly nftService: NftService,
     @InjectRepository(Minting)
     private mintingRepository: Repository<Minting>,
     @InjectRepository(MintingConfig)
-    private mintingConfigRepository: Repository<MintingConfig>
+    private mintingConfigRepository: Repository<MintingConfig>,
   ) {}
 
   async getMintingConfig(): Promise<MintingConfig> {
-    const config = await this.mintingConfigRepository.findOne({ where: { id: 1 } });
+    const config = await this.mintingConfigRepository.findOne({
+      where: { id: 1 },
+    });
     if (!config) {
       throw new NotFoundException('Minting configuration not found');
     }
     return config;
   }
 
-  async updateMintingConfig(updateMintingConfigDto: UpdateMintingConfigDto): Promise<MintingConfig> {
-    let config = await this.mintingConfigRepository.findOne({ where: { id: 1 } });
+  async updateMintingConfig(
+    updateMintingConfigDto: UpdateMintingConfigDto,
+  ): Promise<MintingConfig> {
+    let config = await this.mintingConfigRepository.findOne({
+      where: { id: 1 },
+    });
     if (!config) {
-      config = this.mintingConfigRepository.create({ id: 1, ...updateMintingConfigDto });
+      config = this.mintingConfigRepository.create({
+        id: 1,
+        ...updateMintingConfigDto,
+      });
     } else {
       Object.assign(config, updateMintingConfigDto);
     }
     return this.mintingConfigRepository.save(config);
   }
 
-  async minting(createMintingDto: CreateMintingDto): Promise<Minting> {
-    const minting = this.mintingRepository.create({
-      ...createMintingDto
+  async mintingStep1(
+    userId: number,
+    walletAddress: string,
+    createMintingStep1Dto: CreateMintingStep1Dto,
+  ): Promise<any> {
+    /*
+     * 민팅 가능 상태 확인
+     */
+    
+    const { fiat, amount } = createMintingStep1Dto;
+    const price = await calcPrice(fiat, amount);
+    const priceTo18Decimal = await convert18Decimal(price);
+
+    const minting = await this.mintingRepository.save({
+      userId,
+      walletAddress,
+      price: priceTo18Decimal,
+      ...createMintingStep1Dto,
     });
 
     const remainingSupply = await this.getRemainingSupply();
-    const amount = minting.amount;
     const newRemainingSupply = remainingSupply - amount;
     
-    ////수량 적용
+    /*
+     * 수량 적용
+     */
 
 
-    return this.mintingRepository.save(minting);
+    //return this.mintingRepository.save(minting);
+    return { id: minting.id, price: minting.price, fiat };
+  }
+
+  async mintingStep2(
+    createMintingStep2Dto: CreateMintingStep2Dto,
+  ): Promise<any> {
+    const { id, txHash } = createMintingStep2Dto;
+
+    //const minting = await this.findMintingById(id);
+    //const { walletAddress, fiat, price } = minting;
+
+    /*
+     * 트랜잭션 검증은 데몬에서
+     * const mintingId = minting.id;
+     * await this.nftService.createNft(userId, walletAddress, mintingId);
+     */
+
+    return await this.mintingRepository.save({
+      status: 'CINFIRMING', 
+      ...createMintingStep2Dto,
+    });
+  }
+
+  async findMintingById(id: number) {
+    return await this.mintingRepository.findOne({ where: { id } });
   }
 
   async findAll(paginationQuery) {
@@ -77,5 +133,9 @@ export class MintingService {
     const calculatedSupply = await this.getCalculatedSupply();
     const remainingSupply = 50000 - calculatedSupply;
     return remainingSupply;
+  }
+
+  async updateMintingStatus(mintingId: number, status: string) {
+    await this.mintingRepository.update({ id: mintingId }, { status });
   }
 }

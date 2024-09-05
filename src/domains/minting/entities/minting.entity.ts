@@ -11,20 +11,17 @@ export class Minting {
   @Column({ name: 'wallet_address' })
   walletAddress: string;
 
-  @Column({ name: 'nft_id' })
-  nftId: number;
-
-  @Column({ name: 'tx_hash' })
-  txHash: string;
+  @Column()
+  amount: number;
   
   @Column()
   fiat: string;
 
   @Column()
-  balance: string;
+  price: string;
 
-  @Column()
-  amount: number;
+  @Column({ name: 'tx_hash' })
+  txHash: string;
   
   @Column()
   status: string;
