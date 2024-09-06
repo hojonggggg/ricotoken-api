@@ -232,7 +232,7 @@ export class DaemonService {
     await this.minting();
   }
 
-  @Cron('*/10 * * * * *')
+  @Cron('*/10 * * * *')
   async handleRewardDaemon() {
     const currentTime = new Date();
     console.log({ currentTime });
