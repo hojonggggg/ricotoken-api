@@ -19,4 +19,7 @@ export class Nft {
   
   @Column()
   status: string;
+
+  @Column({ name: 'wallet_address' })
+  walletAddress: string;
 }

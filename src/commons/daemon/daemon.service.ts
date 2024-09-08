@@ -141,6 +141,9 @@ export class DaemonService {
       if (nfts.length > 0) {
         for await (let nft of nfts) {
           const uid = nft.uid;
+
+          
+
           await this.nftRepository.update(
             { uid }, { nftId: uid, status: 'ACTIVE' }
           )
