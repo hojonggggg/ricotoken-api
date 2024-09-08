@@ -144,6 +144,12 @@ export class MintingService {
     return remainingSupply;
   }
 
+  async getPrice() {
+    const config = await this.getMintingConfig();
+    const { ricoPrice, usdtPrice } = config;
+    return { ricoPrice, usdtPrice };
+  }
+
   async updateMintingStatus(mintingId: number, status: string) {
     await this.mintingRepository.update({ id: mintingId }, { status });
   }

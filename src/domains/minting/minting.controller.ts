@@ -43,6 +43,13 @@ export class MintingController {
     return { remainingSupply: remainingSupply };
   }
 
+  @Get('price')
+  @ApiOperation({ summary: 'NFT 민팅 가격' })
+  @ApiResponse({ status: 200 })
+  async getPrice(): Promise<any> {
+    return await this.mintingService.getPrice();
+  }
+
   @Post('step1')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

@@ -7,10 +7,15 @@ export class MintingConfig {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({ example: 100, description: 'The token price' })
+  @ApiProperty({ example: 100, description: 'The rico price' })
   //@Column('decimal', { precision: 18, scale: 8 })
-  @Column({ name: 'token_price' })
-  tokenPrice: string;
+  @Column({ name: 'rico_price' })
+  ricoPrice: string;
+
+  @ApiProperty({ example: 100, description: 'The usdt price' })
+  //@Column('decimal', { precision: 18, scale: 8 })
+  @Column({ name: 'usdt_price' })
+  usdtPrice: string;
 
   @ApiProperty({ example: 1000, description: 'The NFT sale amount' })
   //@Column('decimal', { precision: 18, scale: 8 })

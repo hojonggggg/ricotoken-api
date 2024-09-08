@@ -295,7 +295,7 @@ export class StakingService {
     return this.stakingRepository.count({ where: { userId, status: 'Staked' } });
   }
 
-  async claims(userId: number, walletAddress: string): Promise<void> {
+  async claims(userId: number, walletAddress: string, claimStakingDto: ClaimStakingDto): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();
@@ -340,7 +340,7 @@ export class StakingService {
     }
   }
 
-  async claim(userId: number, walletAddress: string, stakingId: number): Promise<void> {
+  async claim(userId: number, walletAddress: string, stakingId: number, claimStakingDto: ClaimStakingDto): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();
