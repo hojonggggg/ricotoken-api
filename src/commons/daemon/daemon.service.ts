@@ -142,7 +142,7 @@ export class DaemonService {
         for await (let nft of nfts) {
           const uid = nft.uid;
 
-          
+
 
           await this.nftRepository.update(
             { uid }, { nftId: uid, status: 'ACTIVE' }
@@ -232,7 +232,7 @@ export class DaemonService {
     //console.log({ currentTime });
 
     await this.mintingScan();
-    await this.minting();
+    //await this.minting();
   }
 
   @Cron('*/10 * * * *')
