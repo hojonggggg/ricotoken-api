@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { AllowedIp } from './entities/allowed-ip.entity';
 import { AdminLog } from './entities/admin-log.entity';
 
@@ -55,10 +55,16 @@ export class AdminsService {
     const skip = (page - 1) * limit;
 
     const [logs, total] = await this.adminLogRepository.findAndCount({
+      where: { ip: Not('::1') },
       order: { createdAt: 'DESC' },
       take: limit,
       skip: (page - 1) * limit,
     });
+
+    logs.map(item => ({
+      ...item,
+      ip: item.ip.replace(/^::ffff:/, '')
+    }));
 
     return {
       data: logs,
