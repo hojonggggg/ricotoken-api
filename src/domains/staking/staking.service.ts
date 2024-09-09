@@ -234,6 +234,8 @@ export class StakingService {
 
   async getStats(): Promise<any> {
     const stat = await this.stakingStatRepository.findOne({ where: { id: 1 } });
+    const price = await this.mintingService.getPrice();
+    const ricoPrice = price.usdtPrice;
     const stats = {
       total: {
         totalStaked: await this.getTotalStakingCount(),
@@ -241,11 +243,11 @@ export class StakingService {
         apy: await this.getAPY()
       },
       nriStat: {
-        nriPrice: stat.nriPrice,
+        nriPrice: +ricoPrice * 25000,
         calculatedSupply: await this.mintingService.getCalculatedSupply(),
       },
       ricoStat: {
-        ricoPrice: stat.ricoPrice
+        ricoPrice: +ricoPrice
       }
     }
     return stats;
