@@ -76,7 +76,7 @@ export class AdminsController {
     //return this.mintingService.getMintingConfig();
     const config = await this.mintingService.getMintingConfig();
     const { usdtPrice, nftPriceAmount, isMintingActive } = config;
-    return { usdtPrice, nftSaleAmount: nftPriceAmount, isMintingActive};
+    return { usdtPrice, nftPriceAmount, isMintingActive};
   }
 
   @Put('minting-config')

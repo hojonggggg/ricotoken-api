@@ -7,25 +7,20 @@ export class MintingConfig {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({ example: 100, description: 'The rico price' })
-  //@Column('decimal', { precision: 18, scale: 8 })
-  @Column({ name: 'rico_price' })
-  ricoPrice: string;
-
   @ApiProperty({ example: 100, description: 'The usdt price' })
   //@Column('decimal', { precision: 18, scale: 8 })
   @Column({ name: 'usdt_price' })
   usdtPrice: string;
 
-  @ApiProperty({ example: 1000, description: 'The NFT sale amount' })
-  //@Column('decimal', { precision: 18, scale: 8 })
-  @Column({ name: 'nft_sale_amount' })
-  nftSaleAmount: number;
-
   @ApiProperty({ example: 1000, description: 'The NFT price amount' })
   //@Column('decimal', { precision: 18, scale: 8 })
   @Column({ name: 'nft_price_amount' })
   nftPriceAmount: number;
+
+  @ApiProperty({ example: 1000, description: 'The NFT price amount' })
+  //@Column('decimal', { precision: 18, scale: 8 })
+  @Column({ name: 'minting_start_block' })
+  mintingStartBlock: number;
 
   @ApiProperty({ example: true, description: 'Whether minting is active' })
   @Column({ name: 'is_minting_active', default: false })

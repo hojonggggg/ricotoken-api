@@ -153,8 +153,8 @@ export class MintingService {
 
   async getPrice() {
     const config = await this.getMintingConfig();
-    const { ricoPrice, usdtPrice, nftPriceAmount } = config;
-    return { ricoPrice: nftPriceAmount, usdtPrice };
+    const { usdtPrice, nftPriceAmount } = config;
+    return { nftPriceAmount, usdtPrice };
   }
 
   async updateMintingStatus(mintingId: number, status: string) {
