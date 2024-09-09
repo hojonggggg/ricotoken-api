@@ -95,6 +95,7 @@ export class StakingController {
   @ApiOperation({ summary: '보상 전체 수령' })
   @ApiResponse({ status: 200 })
   async claims(@Request() req) {
+    console.log("claims start");
     const { userId, walletAddress } = req.user;
     await this.stakingService.claims(userId, walletAddress);
     return { message: 'SUCCESS' };
