@@ -141,14 +141,19 @@ export class DaemonService {
         const mintingId = id;
         console.log({mintingId, amount, userId, walletAddress});
 
-        const status = 'MINTING';
+        let status = 'MINTING';
         await this.mintingService.updateMintingStatus(mintingId, status);
 
         const tx = await this.blockchainService.mint(walletAddress, amount);
         const { txHash, tokenIds } = tx;
+        console.log({tokenIds});
         for await (let nftId of tokenIds) {
-          await this.nftService.createNft(userId, walletAddress, mintingId, txHash, nftId, 'ACTIVE');
+          console.log({nftId});
+          await this.nftService.createNft(userId, walletAddress, mintingId, nftId, txHash, 'ACTIVE');
         }
+
+        status = 'SUCCESS';
+        await this.mintingService.updateMintingStatus(mintingId, status);
       }
 
 
