@@ -386,6 +386,6 @@ export class StakingService {
 
   async createHistory(userId: number, action: string, txHash: string, amount: string): Promise<StakingHistory> {
     //return await this.stakingHistoryRepository.save({userId, action, txHash, amount});
-    return await this.stakingHistoryRepository.save({userId, action, amount});
+    return await this.stakingHistoryRepository.save({userId, action, amount, txHash});
   }
 }
