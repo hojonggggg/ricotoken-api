@@ -135,7 +135,14 @@ export class MintingService {
   }
 
   async getCalculatedSupply() {
-    return 456;
+    const minting = await this.mintingRepository
+      .createQueryBuilder("mintings")
+      .select("SUM(mintings.amount)", "totalSupply")
+      .where("mintings.status = 'SUCCESS'")
+      .getRawOne();
+    const { totalSupply } = minting;
+    console.log({totalSupply});
+    return totalSupply;
   }
 
   async getRemainingSupply() {

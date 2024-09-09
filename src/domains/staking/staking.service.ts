@@ -206,11 +206,24 @@ export class StakingService {
   }
 
   async getTotalStakingCount() {
-    return 123;
+    const [stakings, total] = await this.stakingRepository.findAndCount({ where: { status: 'Staked' } });
+    console.log({stakings, total});
+    return total;
   }
 
   async getAPY() {
-    return 12;
+    const config = await this.stakingConfigRepository.findOne({ where: { id: 1 } });
+    const dailyReward = config.rewardAmount;
+    const yearReward = dailyReward * 365;
+    const price = await this.mintingService.getPrice();
+    const ricoPrice = price.usdtPrice;
+    const nriPrice = +ricoPrice * 25000;
+    console.log({dailyReward, yearReward, ricoPrice, nriPrice});
+    const top = yearReward * (+ricoPrice) * 100;
+    const bottom = nriPrice;
+    const apy = top / bottom;
+    console.log({top, bottom, apy});
+    return apy;
   }
 
   async getClaimFee() {
