@@ -26,4 +26,8 @@ export class StakingHistory {
   @ApiProperty()
   @Column({ name: 'created_at' })
   createdAt: Date;
+
+  @ApiProperty({ example: 2, description: '' })
+  @Column({ name: 'claim_id' })
+  claimId: number;
 }

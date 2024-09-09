@@ -10,6 +10,7 @@ import { StakingConfig } from 'src/domains/staking/entities/staking-config.entit
 import { Staking } from 'src/domains/staking/entities/staking.entity';
 import { Reward } from 'src/domains/staking/entities/reward.entity';
 import { Claim } from 'src/domains/staking/entities/claim.entity';
+import { StakingHistory } from 'src/domains/staking/entities/staking-history.entity';
 import { Cron } from '@nestjs/schedule';
 import { ethers, Interface } from 'ethers';
 const provider = new ethers.JsonRpcProvider(
@@ -39,6 +40,8 @@ export class DaemonService {
     private rewardRepository: Repository<Reward>,
     @InjectRepository(Claim)
     private claimRepository: Repository<Claim>,
+    @InjectRepository(StakingHistory)
+    private stakingHistoryRepository: Repository<StakingHistory>,
   ) {}
 
   async mintingScan() {
@@ -219,6 +222,12 @@ export class DaemonService {
         await this.claimRepository.update(
           { id }, { txHash, status: 'SUCCESS' }
         );
+
+        await this.stakingHistoryRepository.update(
+          { claimId: id }, { txHash }
+        );
+
+        
       }
 
 

@@ -309,7 +309,8 @@ export class StakingService {
         .getRawOne();
       const { totalReward } = staking;
       console.log({totalReward});
-      let balance = convertToDecimal18(totalReward);
+      //let balance = convertToDecimal18(totalReward);
+      let balance = totalReward;
       const claimFee = await this.getClaimFee();
       console.log({balance, claimFee});
 
@@ -318,13 +319,14 @@ export class StakingService {
         console.log({balance});
         
         await this.stakingRepository.update({ userId }, { reward: 0 });
-        await this.claimRepository.save({
+        const claim = await this.claimRepository.create({
           userId,
           walletAddress,
           balance,
           status: 'WAIT'
         });
-        
+        await this.claimRepository.save(claim);
+        await this.stakingHistoryRepository.save({userId, action: 'Claim', balance, claimId: claim.id});
       }
       await queryRunner.commitTransaction();
     } catch (error) {
