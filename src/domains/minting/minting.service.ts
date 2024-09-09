@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Minting } from './entities/minting.entity';
 import { MintingConfig } from './entities/minting-config.entity';
 import { UpdateMintingConfigDto } from './dto/update-minting-config.dto';
@@ -118,6 +118,7 @@ export class MintingService {
     const skip = (page - 1) * limit;
 
     const [mintings, total] = await this.mintingRepository.findAndCount({
+      where: { status: Not('WAIT') },
       skip,
       take: limit,
       order: { id: 'DESC' }, // 정렬 옵션
