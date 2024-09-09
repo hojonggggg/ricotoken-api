@@ -54,14 +54,14 @@ export class AdminsService {
     const { page, limit } = paginationQuery;
     const skip = (page - 1) * limit;
 
-    const [logs, total] = await this.adminLogRepository.findAndCount({
+    let [logs, total] = await this.adminLogRepository.findAndCount({
       where: { ip: Not('::1') },
       order: { createdAt: 'DESC' },
       take: limit,
       skip: (page - 1) * limit,
     });
 
-    logs.map(item => ({
+    logs = logs.map(item => ({
       ...item,
       ip: item.ip.replace(/^::ffff:/, '')
     }));
