@@ -154,15 +154,15 @@ export class StakingService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      const { id, txHash } = cancelStakingDto;
-      const staking = await this.stakingRepository.findOne({ where: { id, userId } });
+      const { nftId, txHash } = cancelStakingDto;
+      const staking = await this.stakingRepository.findOne({ where: { nftId, userId } });
       if (!staking) {
-        throw new NotFoundException(`Staking with ID "${id}" not found`);
+        throw new NotFoundException(`Staking with ID "${nftId}" not found`);
       }
       staking.status = 'Unstaked';
       await this.stakingRepository.save(staking);
 
-      const nftId = staking.nftId;
+      //const nftId = staking.nftId;
       const nftStatus = 'INACTIVE';
       const newNftStatus = 'ACTIVE';
 
