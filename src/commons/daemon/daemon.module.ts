@@ -9,9 +9,10 @@ import { Nft } from 'src/domains/nft/entities/nft.entity';
 import { StakingConfig } from 'src/domains/staking/entities/staking-config.entity';
 import { Staking } from 'src/domains/staking/entities/staking.entity';
 import { Reward } from 'src/domains/staking/entities/reward.entity';
+import { BlockchainService } from 'src/domains/blockchain/blockchain.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([MintingConfig, Minting, Nft, StakingConfig, Staking, Reward])],
-  providers: [DaemonService, MintingService, NftService]
+  providers: [DaemonService, MintingService, NftService, BlockchainService]
 })
 export class DaemonModule {}

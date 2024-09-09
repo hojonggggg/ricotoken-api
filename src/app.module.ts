@@ -6,6 +6,7 @@ import { AuthModule } from './domains/auth/auth.module';
 import { AdminsModule } from './domains/admins/admins.module';
 import { MintingModule } from './domains/minting/minting.module';
 import { StakingModule } from './domains/staking/staking.module';
+import { BlockchainModule } from './domains/blockchain/blockchain.module';
 import { NftModule } from './domains/nft/nft.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DaemonModule } from './commons/daemon/daemon.module';
@@ -43,6 +44,7 @@ import * as moment from 'moment-timezone';
     NftModule,
     StakingModule,
     ScheduleModule.forRoot(),
+    BlockchainModule,
     DaemonModule
   ],
 })

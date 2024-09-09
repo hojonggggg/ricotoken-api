@@ -31,6 +31,10 @@ export class NftService {
     return nfts;
   }
 
+  async findNftByUid(uid: number): Promise<any> {
+    return await this.nftRepository.findOne({ where: { uid } });
+  }
+
   async updateNftStatusByNftId(nftId: number, status: string, newStatus: string) {
     await this.nftRepository.update({ nftId, status }, { status: newStatus });
   }

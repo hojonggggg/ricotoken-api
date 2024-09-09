@@ -17,6 +17,7 @@ const provider = new ethers.JsonRpcProvider(
 import * as dotenv from 'dotenv';
 dotenv.config();
 import { convertToDecimal18 } from '../shared/functions';
+import { BlockchainService } from 'src/domains/blockchain/blockchain.service';
 
 @Injectable()
 export class DaemonService {
@@ -24,6 +25,7 @@ export class DaemonService {
     private readonly dataSource: DataSource,
     private readonly mintingService: MintingService,
     private readonly nftService: NftService,
+    private readonly blockchainService: BlockchainService,
     @InjectRepository(Minting)
     private mintingRepository: Repository<Minting>,
     @InjectRepository(Nft)
@@ -35,13 +37,6 @@ export class DaemonService {
     @InjectRepository(Reward)
     private rewardRepository: Repository<Reward>,
   ) {}
-
-  async test() {
-    const contractAddress = '0xdDd59c4eCf09E0b6E7F8f3B73518A41dB12Bd71b';
-    const stakeAbi = ['function stake(uint nftId)'];
-    const contract = new ethers.Contract(contractAddress, stakeAbi, provider);
-    console.log({ contract });
-  }
 
   async mintingScan() {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -110,14 +105,18 @@ export class DaemonService {
           txAmount === price
         ) {
           const mintingId = minting.id;
+
+          let status = 'MINTING';
+          await this.mintingService.updateMintingStatus(mintingId, status);
+          
           const nftPromises = Array.from(
             { length: amount },
             async () =>
               await this.nftService.createNft(userId, walletAddress, mintingId),
           );
-
           await Promise.all(nftPromises);
-          const status = 'SUCCESS';
+
+          status = 'SUCCESS';
           await this.mintingService.updateMintingStatus(mintingId, status);
         }
       }
@@ -140,13 +139,20 @@ export class DaemonService {
 
       if (nfts.length > 0) {
         for await (let nft of nfts) {
-          const uid = nft.uid;
-
-
+          const { uid, walletAddress } = nft;
 
           await this.nftRepository.update(
-            { uid }, { nftId: uid, status: 'ACTIVE' }
+            { uid }, { status: 'MINTING' }
           )
+
+          const item = await this.nftService.findNftByUid(uid);
+          if (item.status === 'MINTING') {
+            const tx = await this.blockchainService.mint(walletAddress);
+            const { tokenId, txHash } = tx;
+            await this.nftRepository.update(
+              { uid }, { nftId: Number(tokenId), txHash, status: 'ACTIVE' }
+            );
+          }
 
           //await this.syncTracker(networkId, trackingType, blockNumber);
           //await this.blockNumberUpdate(networkId, trackingType, blockNumber);
@@ -232,7 +238,7 @@ export class DaemonService {
     //console.log({ currentTime });
 
     await this.mintingScan();
-    //await this.minting();
+    await this.minting();
   }
 
   @Cron('*/10 * * * *')
