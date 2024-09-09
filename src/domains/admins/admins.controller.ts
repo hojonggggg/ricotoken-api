@@ -72,8 +72,11 @@ export class AdminsController {
   @Get('minting-config')
   @ApiOperation({ summary: '민팅 설정 정보 조회' })
   @ApiResponse({ status: 200, type: MintingConfig })
-  async getMintingConfig(): Promise<MintingConfig> {
-    return this.mintingService.getMintingConfig();
+  async getMintingConfig(): Promise<any> {
+    //return this.mintingService.getMintingConfig();
+    const config = await this.mintingService.getMintingConfig();
+    const { usdtPrice, nftPriceAmount, isMintingActive } = config;
+    return { usdtPrice, nftSaleAmount: nftPriceAmount, isMintingActive};
   }
 
   @Put('minting-config')
