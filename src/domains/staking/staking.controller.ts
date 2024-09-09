@@ -94,12 +94,12 @@ export class StakingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '보상 전체 수령' })
   @ApiResponse({ status: 200 })
-  async claims(@Body() claimStakingDto: ClaimStakingDto, @Request() req) {
+  async claims(@Request() req) {
     const { userId, walletAddress } = req.user;
-    await this.stakingService.claims(userId, walletAddress, claimStakingDto);
+    await this.stakingService.claims(userId, walletAddress);
     return { message: 'SUCCESS' };
   }
-
+  /*
   @Patch('staking/claim/:stakingId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -110,6 +110,7 @@ export class StakingController {
     await this.stakingService.claim(userId, walletAddress, stakingId, claimStakingDto);
     return { message: 'SUCCESS' };
   }
+  */
   /*
   @Patch('staking/unstakeds')
   @UseGuards(JwtAuthGuard)

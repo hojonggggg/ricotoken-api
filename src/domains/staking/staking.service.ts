@@ -295,7 +295,7 @@ export class StakingService {
     return this.stakingRepository.count({ where: { userId, status: 'Staked' } });
   }
 
-  async claims(userId: number, walletAddress: string, claimStakingDto: ClaimStakingDto): Promise<void> {
+  async claims(userId: number, walletAddress: string): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();
@@ -315,23 +315,17 @@ export class StakingService {
 
       if (stringToBignumber(balance).isGreaterThan(stringToBignumber(claimFee))) {
         balance = (stringToBignumber(balance).minus(stringToBignumber(claimFee))).toFixed();
+        console.log({balance});
+        /*
+        await this.stakingRepository.update({ userId }, { reward: 0 });
+        await this.claimRepository.save({
+          userId,
+          walletAddress,
+          balance,
+          status: 'WAIT'
+        });
+        */
       }
-
-      //await this.stakingRepository.update({ userId, status:'Staked' }, { reward: 0 });
-      await this.stakingRepository.update({ userId }, { reward: 0 });
-      await this.claimRepository.save({
-        userId,
-        walletAddress,
-        balance,
-        status: 'WAIT'
-      });
-      
-      /*
-      const { txHash } = claimStakingDto;
-      const action = 'Claim';
-      const amount = totalReward.toString();
-      await this.createHistory(userId, action, txHash, amount);
-      */
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();

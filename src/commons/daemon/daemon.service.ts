@@ -9,6 +9,7 @@ import { Nft } from 'src/domains/nft/entities/nft.entity';
 import { StakingConfig } from 'src/domains/staking/entities/staking-config.entity';
 import { Staking } from 'src/domains/staking/entities/staking.entity';
 import { Reward } from 'src/domains/staking/entities/reward.entity';
+import { Claim } from 'src/domains/staking/entities/claim.entity';
 import { Cron } from '@nestjs/schedule';
 import { ethers, Interface } from 'ethers';
 const provider = new ethers.JsonRpcProvider(
@@ -36,6 +37,8 @@ export class DaemonService {
     private stakingRepository: Repository<Staking>,
     @InjectRepository(Reward)
     private rewardRepository: Repository<Reward>,
+    @InjectRepository(Claim)
+    private claimRepository: Repository<Claim>,
   ) {}
 
   async mintingScan() {
@@ -195,6 +198,68 @@ export class DaemonService {
     }
   }
 
+  async claim() {
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      const item = await this.claimRepository.findOne({ where: { status: 'WAIT' } });
+      if (item) {
+        console.log({item});
+        const { id, balance, userId, walletAddress } = item;
+        console.log({id, balance, userId, walletAddress});
+
+        await this.claimRepository.update(
+          { id }, { status: 'CLAIM_WAIT' }
+        );
+
+        const txHash = await this.blockchainService.claim(walletAddress, balance);
+
+        await this.claimRepository.update(
+          { id }, { txHash, status: 'SUCCESS' }
+        );
+      }
+
+
+      /*
+      const nfts = await this.nftRepository.find({
+        where: { status: 'WAIT' },
+      });
+
+      if (nfts.length > 0) {
+        for await (let nft of nfts) {
+          const { uid, walletAddress } = nft;
+
+          await this.nftRepository.update(
+            { uid }, { status: 'MINTING' }
+          )
+
+          const item = await this.nftService.findNftByUid(uid);
+          const { amount, status } = item;
+          if (status === 'MINTING') {
+
+            const tx = await this.blockchainService.mint(walletAddress, amount);
+            const { tokenId, txHash } = tx;
+            await this.nftRepository.update(
+              { uid }, { nftId: Number(tokenId), txHash, status: 'ACTIVE' }
+            );
+          }
+
+          //await this.syncTracker(networkId, trackingType, blockNumber);
+          //await this.blockNumberUpdate(networkId, trackingType, blockNumber);
+        }
+      }
+      */
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   async reward(currentTime) {
     /*
      * 보상 적용
@@ -267,6 +332,7 @@ export class DaemonService {
 
     await this.mintingScan();
     await this.minting();
+    await this.claim();
   }
 
   @Cron('*/10 * * * *')
