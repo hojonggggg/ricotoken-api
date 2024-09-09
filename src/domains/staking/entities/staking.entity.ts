@@ -15,6 +15,9 @@ export class Staking {
   @Column({ name: 'wallet_address' })
   walletAddress: string;
 
+  @Column({ name: 'tx_hash' })
+  txHash: string;
+
   @Column()
   status: string;
 
