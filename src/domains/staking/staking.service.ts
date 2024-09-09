@@ -326,7 +326,7 @@ export class StakingService {
           status: 'WAIT'
         });
         await this.claimRepository.save(claim);
-        await this.stakingHistoryRepository.save({userId, action: 'Claim', balance, claimId: claim.id});
+        await this.stakingHistoryRepository.save({userId, action: 'Claim', amount: balance, claimId: claim.id});
       }
       await queryRunner.commitTransaction();
     } catch (error) {
