@@ -25,4 +25,5 @@ export class Minting {
   
   @Column()
   status: string;
+  length: number;
 }

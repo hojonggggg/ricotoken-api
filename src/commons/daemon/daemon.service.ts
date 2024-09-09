@@ -106,9 +106,9 @@ export class DaemonService {
         ) {
           const mintingId = minting.id;
 
-          let status = 'MINTING';
+          const status = 'MINT-WAIT';
           await this.mintingService.updateMintingStatus(mintingId, status);
-          
+          /*
           const nftPromises = Array.from(
             { length: amount },
             async () =>
@@ -118,6 +118,7 @@ export class DaemonService {
 
           status = 'SUCCESS';
           await this.mintingService.updateMintingStatus(mintingId, status);
+          */
         }
       }
     }
@@ -133,6 +134,25 @@ export class DaemonService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
+      const item = await this.mintingRepository.findOne({ where: { status: 'MINT-WAIT' } });
+      if (item) {
+        console.log({item});
+        const { id, amount, userId, walletAddress } = item;
+        const mintingId = id;
+        console.log({mintingId, amount, userId, walletAddress});
+
+        const status = 'MINTING';
+        await this.mintingService.updateMintingStatus(mintingId, status);
+
+        const tx = await this.blockchainService.mint(walletAddress, amount);
+        const { txHash, tokenIds } = tx;
+        for await (let nftId of tokenIds) {
+          await this.nftService.createNft(userId, walletAddress, mintingId, txHash, nftId, 'ACTIVE');
+        }
+      }
+
+
+      /*
       const nfts = await this.nftRepository.find({
         where: { status: 'WAIT' },
       });
@@ -146,8 +166,10 @@ export class DaemonService {
           )
 
           const item = await this.nftService.findNftByUid(uid);
-          if (item.status === 'MINTING') {
-            const tx = await this.blockchainService.mint(walletAddress);
+          const { amount, status } = item;
+          if (status === 'MINTING') {
+
+            const tx = await this.blockchainService.mint(walletAddress, amount);
             const { tokenId, txHash } = tx;
             await this.nftRepository.update(
               { uid }, { nftId: Number(tokenId), txHash, status: 'ACTIVE' }
@@ -158,6 +180,7 @@ export class DaemonService {
           //await this.blockNumberUpdate(networkId, trackingType, blockNumber);
         }
       }
+      */
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
