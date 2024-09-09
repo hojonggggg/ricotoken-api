@@ -9,7 +9,7 @@ import { AdminsService } from '../admins/admins.service';
 import { MintingService } from '../minting/minting.service';
 import { NftService } from '../nft/nft.service';
 import { JoinStakingDto } from './dto/join-staking.dto';
-import { CancelStakingDto, CancelStakingsDto } from './dto/cancel-staking.dto';
+import { CancelStakingDto } from './dto/cancel-staking.dto';
 import { Claim } from './entities/claim.entity';
 import { ClaimStakingDto } from './dto/claim-staking.dto';
 import { StakingStat } from './entities/staking-stat.entity';
@@ -178,7 +178,7 @@ export class StakingService {
     }
   }
 
-  async cancelMintings(userId: number, cancelStakingsDto: CancelStakingsDto): Promise<void> {
+  async cancelMintings(userId: number, cancelStakingsDto: CancelStakingDto): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();

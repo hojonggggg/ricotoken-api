@@ -12,7 +12,7 @@ import { StakingHistory } from './entities/staking-history.entity';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UpdateStakingConfigDto } from './dto/update-staking-config.dto';
 import { JoinStakingDto } from './dto/join-staking.dto';
-import { CancelStakingDto, CancelStakingsDto } from './dto/cancel-staking.dto';
+import { CancelStakingDto } from './dto/cancel-staking.dto';
 import { ClaimStakingDto } from './dto/claim-staking.dto';
 import { PaginationResponseDto } from './dto/pagination-response.dto';
 
