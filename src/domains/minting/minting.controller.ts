@@ -27,11 +27,12 @@ import { CreateMintingStep1Dto, CreateMintingStep2Dto } from './dto/create-minti
 export class MintingController {
   constructor(private readonly mintingService: MintingService) {}
 
-  @Get('config')
+  @Get('start-block')
   @ApiOperation({ summary: 'config' })
   @ApiResponse({ status: 200 })
-  async getMintingConfig() {
-    return await this.mintingService.getMintingConfig();
+  async getMintingBlock() {
+    const config = await this.mintingService.getMintingConfig();
+    return { mintingStartBlock: config.mintingStartBlock };
   }
 
   @Get('is-active')
