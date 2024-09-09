@@ -29,7 +29,8 @@ export class AdminsService {
 
   async getAllAllowedIps(): Promise<AllowedIp[]> {
     const allowedIps = await this.allowedIpsRepository.find({
-      select: ['ip']
+      select: ['ip'],
+      where: { ip: Not('::1') }
     });
   
     return allowedIps.map(item => ({
