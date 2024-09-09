@@ -27,6 +27,13 @@ import { CreateMintingStep1Dto, CreateMintingStep2Dto } from './dto/create-minti
 export class MintingController {
   constructor(private readonly mintingService: MintingService) {}
 
+  @Get('config')
+  @ApiOperation({ summary: 'config' })
+  @ApiResponse({ status: 200 })
+  async getMintingConfig() {
+    return await this.mintingService.getMintingConfig();
+  }
+
   @Get('is-active')
   @ApiOperation({ summary: 'NFT 판매 상태' })
   @ApiResponse({ status: 200 })
