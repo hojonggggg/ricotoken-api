@@ -154,7 +154,7 @@ export class MintingService {
   async getPrice() {
     const config = await this.getMintingConfig();
     const { usdtPrice, nftPriceAmount } = config;
-    return { nftPriceAmount, usdtPrice };
+    return { nftSaleAmount: nftPriceAmount, usdtPrice };
   }
 
   async updateMintingStatus(mintingId: number, status: string) {
