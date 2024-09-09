@@ -9,9 +9,10 @@ import { NftService } from '../nft/nft.service';
 import { Nft } from '../nft/entities/nft.entity';
 import { AllowedIp } from '../admins/entities/allowed-ip.entity';
 import { AdminLog } from '../admins/entities/admin-log.entity';
+import { Staking } from '../staking/entities/staking.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Minting, MintingConfig, Nft, AllowedIp, AdminLog])],
+  imports: [TypeOrmModule.forFeature([Minting, MintingConfig, Nft, AllowedIp, AdminLog, Staking])],
   providers: [AdminsService, MintingService, NftService],
   controllers: [MintingController],
   exports: [MintingService],

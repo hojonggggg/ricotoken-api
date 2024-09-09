@@ -305,7 +305,7 @@ export class StakingService {
         .createQueryBuilder("stakings")
         .select("SUM(stakings.reward)", "totalReward")
         .where("stakings.userId = :userId", { userId })
-        .andWhere("stakings.status = :status", { status: 'Staked' })
+        //.andWhere("stakings.status = :status", { status: 'Staked' })
         .getRawOne();
       const { totalReward } = staking;
       console.log({totalReward});
@@ -317,7 +317,8 @@ export class StakingService {
         balance = (stringToBignumber(balance).minus(stringToBignumber(claimFee))).toFixed();
       }
 
-      await this.stakingRepository.update({ userId, status:'Staked' }, { reward: 0 });
+      //await this.stakingRepository.update({ userId, status:'Staked' }, { reward: 0 });
+      await this.stakingRepository.update({ userId }, { reward: 0 });
       await this.claimRepository.save({
         userId,
         walletAddress,
