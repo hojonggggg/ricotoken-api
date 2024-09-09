@@ -316,7 +316,7 @@ export class StakingService {
       if (stringToBignumber(balance).isGreaterThan(stringToBignumber(claimFee))) {
         balance = (stringToBignumber(balance).minus(stringToBignumber(claimFee))).toFixed();
         console.log({balance});
-        /*
+        
         await this.stakingRepository.update({ userId }, { reward: 0 });
         await this.claimRepository.save({
           userId,
@@ -324,7 +324,7 @@ export class StakingService {
           balance,
           status: 'WAIT'
         });
-        */
+        
       }
       await queryRunner.commitTransaction();
     } catch (error) {
