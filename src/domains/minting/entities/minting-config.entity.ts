@@ -22,6 +22,11 @@ export class MintingConfig {
   @Column({ name: 'nft_sale_amount' })
   nftSaleAmount: number;
 
+  @ApiProperty({ example: 1000, description: 'The NFT price amount' })
+  //@Column('decimal', { precision: 18, scale: 8 })
+  @Column({ name: 'nft_price_amount' })
+  nftPriceAmount: number;
+
   @ApiProperty({ example: true, description: 'Whether minting is active' })
   @Column({ name: 'is_minting_active', default: false })
   isMintingActive: boolean;
