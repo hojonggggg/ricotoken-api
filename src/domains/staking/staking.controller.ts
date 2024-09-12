@@ -39,6 +39,14 @@ export class StakingController {
     return await this.stakingService.getStats();
   }
 
+  @Get('staking/claim-fee')
+  @ApiOperation({ summary: '보상 수수료 조회' })
+  @ApiResponse({ status: 200 })
+  async getClaimFee(): Promise<{ claimFee: number }> {
+    const claimFee = await this.stakingService.getClaimFee();
+    return { claimFee };
+  }
+
   @Get('staking/historys')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
